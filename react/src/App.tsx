@@ -1,6 +1,10 @@
 import { sdk } from "@farcaster/frame-sdk";
 import { useEffect } from "react";
-import { useAccount, useConnect, useSignMessage } from "wagmi";
+import { HashRouter, Route, Routes } from "react-router-dom";
+
+import { ConnectMenu } from "./components/ConnectMenu";
+import Landing from "./pages/Landing";
+import Game from "./pages/Game";
 
 function App() {
   useEffect(() => {
@@ -8,55 +12,19 @@ function App() {
   }, []);
 
   return (
-    <>
-      <div>Mini App + Vite + TS + React + Wagmi</div>
-      <ConnectMenu />
-    </>
-  );
-}
-
-function ConnectMenu() {
-  const { isConnected, address } = useAccount();
-  const { connect, connectors } = useConnect();
-
-  if (isConnected) {
-    return (
-      <>
-        <div>Connected account:</div>
-        <div>{address}</div>
-        <SignButton />
-      </>
-    );
-  }
-
-  return (
-    <button className="bg-blue-500" type="button" onClick={() => connect({ connector: connectors[0] })}>
-      Connect
-    </button>
-  );
-}
-
-function SignButton() {
-  const { signMessage, isPending, data, error } = useSignMessage();
-
-  return (
-    <>
-      <button className="bg-blue-500" type="button" onClick={() => signMessage({ message: "hello world" })} disabled={isPending}>
-        {isPending ? "Signing..." : "Sign message"}
-      </button>
-      {data && (
-        <>
-          <div>Signature</div>
-          <div>{data}</div>
-        </>
-      )}
-      {error && (
-        <>
-          <div>Error</div>
-          <div>{error.message}</div>
-        </>
-      )}
-    </>
+    <HashRouter>
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white">
+        <ConnectMenu />
+        <Routes>
+          <Route
+            path="/game"
+            element={<Game />} />
+          <Route
+            path="/"
+            element={<Landing />} />
+        </Routes>
+      </div>
+    </HashRouter>
   );
 }
 
