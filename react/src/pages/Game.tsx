@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Plus, Send, RefreshCw } from 'lucide-react';
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
+
+import OnChainScrabble from "../artifacts/contracts/OnChainScrabble.sol/OnChainScrabble.json"
 
 // Types
 interface Player {
@@ -30,6 +33,8 @@ interface GameState {
 }
 
 export default function Game() {
+  const { address } = useAccount();
+  
   const [gameState, setGameState] = useState<GameState>({
     isConnected: false,
     address: null,
@@ -60,23 +65,34 @@ export default function Game() {
     return letter.toUpperCase().charCodeAt(0) - 64;
   };
 
+  const { data: playerTiles = [] } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: OnChainScrabble.abi,
+    functionName: 'getPlayerTiles',
+    args: [address]
+  }) as { data: any  };
+
+  const { data: wordSubmission = [] } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: OnChainScrabble.abi,
+    functionName: 'getWordSubmission'
+  }) as { data: any  };
+
+  const {
+    writeContract,
+    data: txHash,
+    isPending
+  } = useWriteContract();
+
   const joinGame = async () => {
     setIsLoading(true);
     try {
-      // Mock joining game
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      const mockTiles = Array.from({length: 7}, () => Math.floor(Math.random() * 26) + 1);
-      setGameState(prev => ({
-        ...prev,
-        player: {
-          address: prev.address!,
-          isActive: true,
-          tiles: mockTiles,
-          score: 0,
-          tilesUsed: 0
-        },
-        activePlayers: prev.activePlayers + 1
-      }));
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: OnChainScrabble.abi,
+        functionName: "joinGame",
+      })
+      
       showNotification('Successfully joined the game! You received 7 tiles.');
     } catch (error) {
       showNotification('Failed to join game');
@@ -105,30 +121,19 @@ export default function Game() {
   };
 
   const submitWord = async () => {
-    if (!wordInput.trim() || selectedTiles.length === 0) {
-      showNotification('Please enter a word and select tiles');
-      return;
-    }
+    // if (!wordInput.trim() || selectedTiles.length === 0) {
+    //   showNotification('Please enter a word and select tiles');
+    //   return;
+    // }
 
     setIsLoading(true);
     try {
-      // Mock word submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newSubmission: WordSubmission = {
-        id: Date.now(),
-        player: gameState.address!,
-        word: wordInput.toUpperCase(),
-        tilesUsed: selectedTiles,
-        timestamp: Date.now(),
-        verified: false,
-        score: 0
-      };
-
-      setGameState(prev => ({
-        ...prev,
-        submissions: [newSubmission, ...prev.submissions]
-      }));
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: OnChainScrabble.abi,
+        functionName: "submitWord",
+        args: ["A", [1]]
+      })
 
       setWordInput('');
       setSelectedTiles([]);
@@ -162,10 +167,12 @@ export default function Game() {
     return tiles.reduce((sum, tileId) => sum + (tileScores[tileId] || 0), 0);
   };
 
+  console.log(wordSubmission)
+
   return (
     <div className="container mx-auto">
       {/* Join Game Screen */}
-      {!gameState.player?.isActive ? <div className="text-center py-20">
+      {playerTiles.length === 0 ? <div className="text-center py-20">
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-12 max-w-lg mx-auto">
           <h2 className="text-3xl font-bold mb-6">Ready to Play?</h2>
           <p className="text-gray-300 mb-8">
@@ -197,7 +204,7 @@ export default function Game() {
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-3">Your Tiles ({gameState.player?.tiles.length})</h3>
               <div className="flex flex-wrap gap-2">
-                {gameState.player?.tiles.map((tile, index) => (
+                {playerTiles?.map((tile, index) => (
                   <button
                     key={index}
                     onClick={() => toggleTileSelection(index)}
@@ -236,7 +243,6 @@ export default function Game() {
                   />
                   <button
                     onClick={submitWord}
-                    disabled={isLoading || !wordInput.trim() || selectedTiles.length === 0}
                     className="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 flex items-center gap-2"
                   >
                     <Send className="w-4 h-4" />

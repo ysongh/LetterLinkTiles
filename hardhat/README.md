@@ -8,4 +8,4 @@
  ```
 
 ## Deploy to localhost
-npx hardhat ignition deploy ./ignition/modules/TokenTiles.js --network localhost
+npx hardhat ignition deploy ./ignition/modules/OnChainScrabble.js --network localhost
