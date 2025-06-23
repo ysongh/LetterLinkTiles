@@ -1,5 +1,11 @@
 const { ethers } = require('ethers');
+const OpenAI = require('openai');
 require('dotenv').config();
+
+const client = new OpenAI({
+    baseURL: 'https://nilai-a779.nillion.network/v1',
+    apiKey: process.env.NILAI_API_KEY || 'YOUR_API_KEY_HERE'
+});
 
 // Contract ABI for the functions we need
 const CONTRACT_ABI = [
@@ -108,14 +114,27 @@ class ScrabbleAIAgent {
 
             console.log(`🔍 Verifying word: "${submission.word}"`);
             
-            // Verify the word is valid
-            const isValid = await this.isValidWord(submission.word);
+            const response = await client.chat.completions.create({
+                model: 'meta-llama/Llama-3.1-8B-Instruct',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are a dictionary.'
+                    },
+                    {
+                        role: 'user',
+                        content:  `Return true or false if ${submission.word} is a valid word except for proper nouns, abbreviations, or words requiring hyphens or apostrophes`
+                    }
+                ],
+                stream: false
+            });
+            
+            console.log(`Response: ${response.choices[0].message.content}`);
+            
+            const finalIsValid = response.choices[0].message.content.includes("is a valid word");
             
             // Additional validation: check if tiles match the word
             const tilesMatchWord = this.validateTilesMatchWord(submission.word, submission.tilesUsed);
-            
-            // const finalIsValid = isValid && tilesMatchWord;
-            const finalIsValid = true;
             
             console.log(`📊 Verification result for "${submission.word}": ${finalIsValid ? '✅ VALID' : '❌ INVALID'}`);
             if (!tilesMatchWord) {
@@ -152,37 +171,6 @@ class ScrabbleAIAgent {
         return true;
     }
 
-    // Check if a word is valid using multiple methods
-    async isValidWord(word) {
-        const cleanWord = word.toLowerCase().trim();
-        
-        if (cleanWord.length < 2) {
-            return false;
-        }
-
-        // Try multiple validation methods
-        const validationMethods = [
-            () => this.validateWithDictionaryAPI(cleanWord),
-            () => this.validateWithWordList(cleanWord),
-            () => this.validateWithFreeDictionaryAPI(cleanWord)
-        ];
-
-        for (const method of validationMethods) {
-            try {
-                const result = await method();
-                if (result !== null) {
-                    return result;
-                }
-            } catch (error) {
-                console.log(`⚠️  Validation method failed: ${error.message}`);
-                continue;
-            }
-        }
-
-        // If all methods fail, be conservative and reject
-        console.log(`❌ All validation methods failed for word: ${word}`);
-        return false;
-    }
 
     // Validate using Free Dictionary API
     async validateWithFreeDictionaryAPI(word) {
