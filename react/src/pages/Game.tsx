@@ -4,6 +4,7 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
 import OnChainScrabble from "../artifacts/contracts/OnChainScrabble.sol/OnChainScrabble.json"
+import SubmissionCard from '../components/SubmissionCard';
 
 // Types
 interface Player {
@@ -73,11 +74,11 @@ export default function Game() {
     args: [address]
   }) as { data: any  };
 
-  const { data: wordSubmission = [] } = useReadContract({
+  const { data: wordSubmissionCounter = 0 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: OnChainScrabble.abi,
-    functionName: 'getWordSubmission'
-  }) as { data: any  };
+    functionName: 'wordSubmissionCounter'
+  }) as { data: number  };
 
   const {
     writeContract,
@@ -172,7 +173,7 @@ export default function Game() {
     return tiles.reduce((sum, tileId) => sum + (tileScores[tileId] || 0), 0);
   };
 
-  console.log(wordSubmission)
+  console.log(wordSubmissionCounter)
 
   return (
     <div className="container mx-auto">
@@ -201,7 +202,7 @@ export default function Game() {
               <h2 className="text-2xl font-bold">Your Game</h2>
               <div className="flex items-center gap-2 text-xl font-bold">
                 <Trophy className="w-6 h-6 text-yellow-400" />
-                {gameState.player?.score || 0} points
+                {0} points
               </div>
             </div>
             
@@ -275,35 +276,14 @@ export default function Game() {
             </div>
             
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {gameState.submissions.length === 0 ? (
+              {wordSubmissionCounter === 0 ? (
                 <p className="text-gray-400 text-center py-8">No submissions yet</p>
               ) : (
-                gameState.submissions.map((submission) => (
-                  <div key={submission.id} className="bg-white/5 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <div className="font-bold text-lg">{submission.word}</div>
-                        <div className="text-xs text-gray-400">
-                          {submission.player.slice(0, 8)}...
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        {submission.verified ? (
-                          <div className="text-green-400 font-bold">
-                            +{submission.score} pts
-                          </div>
-                        ) : (
-                          <div className="text-yellow-400 text-sm">
-                            Pending...
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(submission.timestamp).toLocaleTimeString()}
-                    </div>
-                  </div>
-                ))
+                <div>
+                  <SubmissionCard id={Number(wordSubmissionCounter) - 1} />
+                  {wordSubmissionCounter > 1 && <SubmissionCard id={Number(wordSubmissionCounter) - 2} />}
+                  {wordSubmissionCounter > 2 && <SubmissionCard id={Number(wordSubmissionCounter) - 3} />}
+                </div>
               )}
             </div>
           </div>
