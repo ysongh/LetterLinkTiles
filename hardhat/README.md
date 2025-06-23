@@ -9,3 +9,6 @@
 
 ## Deploy to localhost
 npx hardhat ignition deploy ./ignition/modules/OnChainScrabble.js --network localhost
+
+## Deploy to Flow EVM Testnet
+npx hardhat ignition deploy ./ignition/modules/OnChainScrabble.js --network flowEVMTestnet
