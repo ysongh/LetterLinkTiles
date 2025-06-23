@@ -142,7 +142,7 @@ export default function Game() {
   };
 
   const toggleTileSelection = (tileIndex: number) => {
-    const tile = gameState.player?.tiles[tileIndex];
+    const tile = playerTiles[tileIndex];
     if (!tile) return;
 
     setSelectedTiles(prev => {
@@ -199,7 +199,7 @@ export default function Game() {
             
             {/* Your Tiles */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">Your Tiles ({gameState.player?.tiles.length})</h3>
+              <h3 className="text-lg font-semibold mb-3">Your Tiles ({playerTiles.length})</h3>
               <div className="flex flex-wrap gap-2">
                 {playerTiles?.map((tile, index) => (
                   <button
@@ -250,8 +250,8 @@ export default function Game() {
               
               {selectedTiles.length > 0 && (
                 <div className="text-sm text-gray-300">
-                  Selected tiles: {selectedTiles.map(index => tileToLetter(gameState.player!.tiles[index])).join(', ')} 
-                  (Score: {calculateWordScore(selectedTiles.map(index => gameState.player!.tiles[index]))})
+                  Selected tiles: {selectedTiles.map(index => tileToLetter(playerTiles[index])).join(', ')} 
+                  (Score: {calculateWordScore(selectedTiles.map(index => playerTiles[index]))})
                 </div>
               )}
             </div>
