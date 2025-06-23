@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Plus, Send, RefreshCw } from 'lucide-react';
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { parseEther } from "viem";
 
 import OnChainScrabble from "../artifacts/contracts/OnChainScrabble.sol/OnChainScrabble.json"
 
@@ -103,17 +104,13 @@ export default function Game() {
   const buyTile = async () => {
     setIsLoading(true);
     try {
-      // Mock buying tile
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const newTile = Math.floor(Math.random() * 26) + 1;
-      setGameState(prev => ({
-        ...prev,
-        player: prev.player ? {
-          ...prev.player,
-          tiles: [...prev.player.tiles, newTile]
-        } : null
-      }));
-      showNotification(`Bought tile: ${tileToLetter(newTile)}`);
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: OnChainScrabble.abi,
+        functionName: "buyTile",
+        value: parseEther("0.001")
+      })
+      showNotification(`Bought tile`);
     } catch (error) {
       showNotification('Failed to buy tile');
     }
