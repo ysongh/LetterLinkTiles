@@ -181,24 +181,24 @@ contract OnChainScrabble {
     // Check if player has required tiles
     function hasRequiredTiles(address player, uint8[] calldata tilesUsed) internal view returns (bool) {
         uint8[] memory playerTiles = players[player].tiles;
-        uint8[] memory tempTiles = new uint8[](playerTiles.length);
         
-        // Copy player tiles to temp array
+        // Count available tiles for each letter (1-26)
+        uint8[27] memory availableCounts;
         for (uint i = 0; i < playerTiles.length; i++) {
-            tempTiles[i] = playerTiles[i];
+            availableCounts[playerTiles[i]]++;
         }
         
-        // Check if all required tiles are available
+        // Count required tiles for each letter
+        uint8[27] memory requiredCounts;
         for (uint i = 0; i < tilesUsed.length; i++) {
-            bool found = false;
-            for (uint j = 0; j < tempTiles.length; j++) {
-                if (tempTiles[j] == tilesUsed[i]) {
-                    tempTiles[j] = 0; // Mark as used
-                    found = true;
-                    break;
-                }
+            requiredCounts[tilesUsed[i]]++;
+        }
+        
+        // Check if we have enough of each required tile
+        for (uint8 tileId = 1; tileId <= 26; tileId++) {
+            if (requiredCounts[tileId] > availableCounts[tileId]) {
+                return false;
             }
-            if (!found) return false;
         }
         
         return true;

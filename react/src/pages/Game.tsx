@@ -118,10 +118,16 @@ export default function Game() {
   };
 
   const submitWord = async () => {
-    // if (!wordInput.trim() || selectedTiles.length === 0) {
-    //   showNotification('Please enter a word and select tiles');
-    //   return;
-    // }
+    if (!wordInput.trim() || selectedTiles.length === 0) {
+      showNotification('Please enter a word and select tiles');
+      return;
+    }
+   
+    const newInput = [];
+
+    for(let i = 0; i < selectedTiles.length; i++) {
+      newInput.push(playerTiles[selectedTiles[i]]);
+    }
 
     setIsLoading(true);
     try {
@@ -129,7 +135,7 @@ export default function Game() {
         address: import.meta.env.VITE_GAME_CONTRACT,
         abi: OnChainScrabble.abi,
         functionName: "submitWord",
-        args: ["A", [1]]
+        args: [wordInput.trim(), newInput]
       })
 
       setWordInput('');
@@ -144,6 +150,8 @@ export default function Game() {
   const toggleTileSelection = (tileIndex: number) => {
     const tile = playerTiles[tileIndex];
     if (!tile) return;
+
+    console.log(tileIndex);
 
     setSelectedTiles(prev => {
       const isSelected = prev.includes(tileIndex);
