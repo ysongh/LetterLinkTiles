@@ -20,7 +20,7 @@ export function ConnectMenu() {
     <header className="bg-black/20 backdrop-blur-lg border-b border-white/10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            On-Chain Scrabble
+            Letter Link Tiles
           </h1>
           
           {!isConnected ? (

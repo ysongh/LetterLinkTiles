@@ -2,6 +2,9 @@
 pragma solidity ^0.8.19;
 
 contract OnChainScrabble {
+    // Address of the Cadence Arch contract
+    address constant public cadenceArch = 0x0000000000000000000000010000000000000001;
+
     // Events
     event PlayerJoined(address indexed player, uint8[] initialTiles);
     event TilePurchased(address indexed player, uint8 tile);
@@ -168,14 +171,25 @@ contract OnChainScrabble {
     
     // Internal function to get a random tile
     function getRandomTile() internal view returns (uint8) {
+        uint64 newRandom = revertibleRandom();
         uint256 randomIndex = uint256(keccak256(abi.encodePacked(
             block.timestamp,
-            block.difficulty,
+            newRandom,
             msg.sender,
             players[msg.sender].tiles.length
         ))) % tilePool.length;
         
         return tilePool[randomIndex];
+    }
+
+    // Function to fetch a pseudo-random value
+    function revertibleRandom() internal view returns (uint64) {
+        // Static call to the Cadence Arch contract's revertibleRandom function
+        (bool ok, bytes memory data) = cadenceArch.staticcall(abi.encodeWithSignature("revertibleRandom()"));
+        require(ok, "Failed to fetch a random number through Cadence Arch");
+        uint64 output = abi.decode(data, (uint64));
+        // Return the random value
+        return output;
     }
     
     // Check if player has required tiles

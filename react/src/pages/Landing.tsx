@@ -7,7 +7,7 @@ function Landing() {
   return (
     <div className="text-center py-20">
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-12 max-w-2xl mx-auto">
-        <h2 className="text-4xl font-bold mb-6">Welcome to On-Chain Scrabble!</h2>
+        <h2 className="text-4xl font-bold mb-6">Welcome to Letter Link Tiles!</h2>
         <p className="text-xl text-gray-300 mb-8">
           Play Scrabble on the blockchain with unlimited grid and AI verification
         </p>
