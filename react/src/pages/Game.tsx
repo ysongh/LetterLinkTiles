@@ -80,6 +80,12 @@ export default function Game() {
     functionName: 'wordSubmissionCounter'
   }) as { data: number  };
 
+  const { data: activePlayers = [] } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: OnChainScrabble.abi,
+    functionName: 'activePlayers',
+  }) as { data: any  };
+
   const {
     writeContract,
     data: txHash,
@@ -294,7 +300,7 @@ export default function Game() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span>Active Players</span>
-                <span className="font-bold">{gameState.activePlayers}</span>
+                <span className="font-bold">{activePlayers.length}</span>
               </div>
               <div className="flex justify-between">
                 <span>Your Score</span>
