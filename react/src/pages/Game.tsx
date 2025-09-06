@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Plus, Send, RefreshCw } from 'lucide-react';
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
 import OnChainScrabble from "../artifacts/contracts/OnChainScrabble.sol/OnChainScrabble.json"
@@ -36,6 +36,7 @@ interface GameState {
 
 export default function Game() {
   const { address } = useAccount();
+  const { data: blockNumber } = useBlockNumber({ watch: true })
   
   const [gameState, setGameState] = useState<GameState>({
     isConnected: false,
@@ -50,6 +51,10 @@ export default function Game() {
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+
+  useEffect(() => {
+    playerTilesRefetch();
+  }, [blockNumber])
 
   // Tile values and letters
   const tileScores: { [key: number]: number } = {
@@ -67,12 +72,12 @@ export default function Game() {
     return letter.toUpperCase().charCodeAt(0) - 64;
   };
 
-  const { data: playerTiles = [] } = useReadContract({
+  const { data: playerTiles = [], refetch: playerTilesRefetch  } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: OnChainScrabble.abi,
     functionName: 'getPlayerTiles',
     args: [address]
-  }) as { data: any  };
+  }) as { data: any, refetch: () => void  };
 
   const { data: wordSubmissionCounter = 0 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
