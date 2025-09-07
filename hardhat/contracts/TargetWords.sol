@@ -44,8 +44,19 @@ contract TargetWords {
   }
   mapping(address => Player) public players;
   address[] public activePlayers;
+  address public owner;
+  string public targetWord1;
+  string public targetWord2;
+  string public targetWord3;
 
-  constructor() {}
+  modifier onlyOwner() {
+    require(msg.sender == owner, "Only owner can call this function");
+    _;
+  }
+
+  constructor() {
+    owner = msg.sender;
+  }
 
   // Join the game and receive 7 random tiles
   function joinGame() external {
@@ -66,7 +77,13 @@ contract TargetWords {
     emit PlayerJoined(msg.sender, initialTiles);
   }
 
-   // Internal function to get a random tile
+  function addTargetWords(string memory _targetWord1, string memory _targetWord2, string memory _targetWord3) external onlyOwner{
+    targetWord1 = _targetWord1;
+    targetWord2 = _targetWord2;
+    targetWord3 = _targetWord3;
+  }
+
+  // Internal function to get a random tile
   function getRandomTile() internal view returns (uint8) {
     uint256 randomIndex = uint256(keccak256(abi.encodePacked(
       block.timestamp,
