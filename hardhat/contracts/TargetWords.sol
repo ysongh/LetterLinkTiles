@@ -101,6 +101,10 @@ contract TargetWords {
     players[player].tilesUsed += tilesUsed.length;
   }
 
+  function _compareStrings(string memory a, string memory b) private pure returns (bool) {
+    return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+  }
+
   // Internal function to get a random tile
   function getRandomTile() internal view returns (uint8) {
     uint256 randomIndex = uint256(keccak256(abi.encodePacked(
