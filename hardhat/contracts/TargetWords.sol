@@ -86,6 +86,21 @@ contract TargetWords {
     targetWord3 = _targetWord3;
   }
 
+  // Remove tiles from player's inventory
+  function removeTilesFromPlayer(address player, uint8[] memory tilesUsed) internal {
+    for (uint i = 0; i < tilesUsed.length; i++) {
+      for (uint j = 0; j < players[player].tiles.length; j++) {
+        if (players[player].tiles[j] == tilesUsed[i]) {
+          // Remove tile by swapping with last element and popping
+          players[player].tiles[j] = players[player].tiles[players[player].tiles.length - 1];
+          players[player].tiles.pop();
+          break;
+        }
+      }
+    }
+    players[player].tilesUsed += tilesUsed.length;
+  }
+
   // Internal function to get a random tile
   function getRandomTile() internal view returns (uint8) {
     uint256 randomIndex = uint256(keccak256(abi.encodePacked(
