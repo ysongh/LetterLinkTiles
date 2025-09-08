@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 contract TargetWords {
   event PlayerJoined(address indexed player, uint8[] initialTiles);
+  event WordSubmitted(address indexed player, string word);
 
   // Tile distribution (A=1, B=2, ..., Z=26)
   // Based on standard Scrabble distribution
@@ -78,6 +79,24 @@ contract TargetWords {
     
     activePlayers.push(msg.sender);
     emit PlayerJoined(msg.sender, initialTiles);
+  }
+
+  function submitWord(string memory targetWord, uint8[] calldata tilesUsed) external {
+    if (_compareStrings(targetWord, targetWord1)) {
+      uint256 wordScore = calculateWordScore(tilesUsed);
+      players[msg.sender].score += wordScore;
+      removeTilesFromPlayer(msg.sender, tilesUsed);
+    } else if (_compareStrings(targetWord, targetWord2)) {
+      uint256 wordScore = calculateWordScore(tilesUsed);
+      players[msg.sender].score += wordScore;
+      removeTilesFromPlayer(msg.sender, tilesUsed);
+    } else if (_compareStrings(targetWord, targetWord3)) {
+      uint256 wordScore = calculateWordScore(tilesUsed);
+      players[msg.sender].score += wordScore;
+      removeTilesFromPlayer(msg.sender, tilesUsed);
+    }
+    
+    emit WordSubmitted(msg.sender, targetWord);
   }
 
   function addTargetWords(string memory _targetWord1, string memory _targetWord2, string memory _targetWord3) external onlyOwner{
