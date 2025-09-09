@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Gamepad2, Trophy, Target, Shuffle, Send, Plus } from 'lucide-react';
+import { useWriteContract } from "wagmi";
+
+import TargetWords from "../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
 interface Player {
   isActive: boolean;
@@ -18,7 +21,7 @@ interface GameState {
   gameEvents: string[];
 }
 
-const TargetWords: React.FC = () => {
+const TargetWordsGame: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>({
     isConnected: false,
     playerAddress: null,
@@ -57,8 +60,20 @@ const TargetWords: React.FC = () => {
     }));
   };
 
+  const {
+    writeContract,
+    data: txHash,
+    isPending
+  } = useWriteContract();
+
   // Mock join game function
   const joinGame = async () => {
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: TargetWords.abi,
+      functionName: "joinGame",
+    })
+    
     // Simulate getting 7 random tiles
     const getRandomTiles = (): number[] => {
       const tiles = [];
@@ -367,4 +382,4 @@ const TargetWords: React.FC = () => {
   );
 };
 
-export default TargetWords;
+export default TargetWordsGame;
