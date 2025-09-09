@@ -120,6 +120,10 @@ contract TargetWords {
     players[player].tilesUsed += tilesUsed.length;
   }
 
+  function getPlayerTiles(address player) external view returns (uint8[] memory) {
+    return players[player].tiles;
+  }
+
   function _compareStrings(string memory a, string memory b) private pure returns (bool) {
     return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
   }

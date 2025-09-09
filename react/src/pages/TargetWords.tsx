@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Gamepad2, Trophy, Target, Shuffle, Send, Plus } from 'lucide-react';
-import { useWriteContract } from "wagmi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 
 import TargetWords from "../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
@@ -22,6 +22,8 @@ interface GameState {
 }
 
 const TargetWordsGame: React.FC = () => {
+  const { address } = useAccount();
+
   const [gameState, setGameState] = useState<GameState>({
     isConnected: false,
     playerAddress: null,
@@ -59,6 +61,13 @@ const TargetWordsGame: React.FC = () => {
       gameEvents: [...prev.gameEvents, `Connected wallet: ${mockAddress}`]
     }));
   };
+
+  const { data: playerTiles = [] } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: TargetWords.abi,
+    functionName: 'getPlayerTiles',
+    args: [address]
+  }) as { data: any };
 
   const {
     writeContract,
@@ -196,6 +205,8 @@ const TargetWordsGame: React.FC = () => {
     }));
   };
 
+  console.log(playerTiles)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
       <div className="container mx-auto px-4 py-8">
@@ -273,7 +284,7 @@ const TargetWordsGame: React.FC = () => {
                   </button>
                 </div>
                 <div className="grid grid-cols-7 gap-3 mb-4">
-                  {gameState.player.tiles.map((tile, index) => (
+                  {playerTiles.map((tile, index) => (
                     <button
                       key={index}
                       onClick={() => toggleTileSelection(index)}
