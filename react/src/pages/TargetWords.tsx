@@ -241,35 +241,6 @@ const TargetWordsGame: React.FC = () => {
           </p>
         </div>
 
-        {/* Connection Status */}
-        <div className="bg-gray-800/50 backdrop-blur rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${gameState.isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
-              <span className="text-lg">
-                {gameState.isConnected ? `Connected: ${gameState.playerAddress}` : 'Not Connected'}
-              </span>
-            </div>
-            {!gameState.isConnected && (
-              <button
-                onClick={connectWallet}
-                className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition-colors"
-              >
-                Connect Wallet
-              </button>
-            )}
-            {gameState.isConnected && !gameState.player?.isActive && (
-              <button
-                onClick={joinGame}
-                className="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg transition-colors flex items-center gap-2"
-              >
-                <Plus size={20} />
-                Join Game
-              </button>
-            )}
-          </div>
-        </div>
-
         {gameState.player?.isActive && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Game Board */}
@@ -387,7 +358,7 @@ const TargetWordsGame: React.FC = () => {
           </div>
         )}
 
-        {!gameState.isConnected && (
+        {!address && (
           <div className="text-center mt-12">
             <div className="bg-gray-800/50 backdrop-blur rounded-lg p-8 max-w-md mx-auto">
               <Gamepad2 size={64} className="text-gray-400 mx-auto mb-4" />
@@ -399,7 +370,7 @@ const TargetWordsGame: React.FC = () => {
           </div>
         )}
 
-        {gameState.isConnected && !gameState.player?.isActive && (
+        {address && !gameState.player?.isActive && (
           <div className="text-center mt-12">
             <div className="bg-gray-800/50 backdrop-blur rounded-lg p-8 max-w-md mx-auto">
               <Plus size={64} className="text-green-400 mx-auto mb-4" />
@@ -407,6 +378,13 @@ const TargetWordsGame: React.FC = () => {
               <p className="text-gray-400 mb-4">
                 Click "Join Game" to receive your starting tiles and begin playing!
               </p>
+              <button
+                onClick={joinGame}
+                className="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg transition-colors flex items-center gap-2"
+              >
+                <Plus size={20} />
+                Join Game
+              </button>
             </div>
           </div>
         )}
