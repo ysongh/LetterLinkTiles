@@ -208,21 +208,6 @@ const TargetWordsGame: React.FC = () => {
     }
   };
 
-  // Shuffle tiles
-  const shuffleTiles = () => {
-    if (!gameState.player) return;
-    
-    setGameState(prev => ({
-      ...prev,
-      player: {
-        ...prev.player!,
-        tiles: [...prev.player!.tiles].sort(() => Math.random() - 0.5)
-      },
-      selectedTiles: [],
-      currentWord: ''
-    }));
-  };
-
   console.log(playerTiles, targetWord1)
 
   return (
@@ -269,7 +254,6 @@ const TargetWordsGame: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Your Tiles</h2>
                   <button
-                    onClick={shuffleTiles}
                     className="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors"
                     title="Shuffle tiles"
                   >
