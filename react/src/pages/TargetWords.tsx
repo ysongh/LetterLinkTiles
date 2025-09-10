@@ -69,6 +69,24 @@ const TargetWordsGame: React.FC = () => {
     args: [address]
   }) as { data: any };
 
+  const { data: targetWord1 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: TargetWords.abi,
+    functionName: 'targetWord1',
+  }) as { data: any };
+
+  const { data: targetWord2 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: TargetWords.abi,
+    functionName: 'targetWord2',
+  }) as { data: any };
+
+  const { data: targetWord3 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: TargetWords.abi,
+    functionName: 'targetWord3',
+  }) as { data: any };
+
   const {
     writeContract,
     data: txHash,
@@ -205,7 +223,7 @@ const TargetWordsGame: React.FC = () => {
     }));
   };
 
-  console.log(playerTiles)
+  console.log(playerTiles, targetWord1)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
@@ -263,11 +281,15 @@ const TargetWordsGame: React.FC = () => {
                   <h2 className="text-xl font-semibold">Target Words</h2>
                 </div>
                 <div className="flex gap-4">
-                  {gameState.targetWords.map((word, index) => (
-                    <div key={index} className="bg-red-900/30 border border-red-400 rounded-lg px-4 py-2 text-center">
-                      <span className="text-lg font-mono">{word}</span>
-                    </div>
-                  ))}
+                  <div className="bg-red-900/30 border border-red-400 rounded-lg px-4 py-2 text-center">
+                    <span className="text-lg font-mono">{targetWord1}</span>
+                  </div>
+                  <div className="bg-red-900/30 border border-red-400 rounded-lg px-4 py-2 text-center">
+                    <span className="text-lg font-mono">{targetWord2}</span>
+                  </div>
+                  <div className="bg-red-900/30 border border-red-400 rounded-lg px-4 py-2 text-center">
+                    <span className="text-lg font-mono">{targetWord3}</span>
+                  </div>
                 </div>
               </div>
 
