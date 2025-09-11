@@ -161,43 +161,17 @@ const TargetWordsGame: React.FC = () => {
 
   // Submit word
   const submitWord = async () => {
-    if (!gameState.player || selectedTiles.length === 0) return;
+    if (selectedTiles.length === 0) return;
 
-    const wordToSubmit = gameState.currentWord;
-    const tilesUsed = selectedTiles.map(i => playerTiles!.tiles[i]);
+    const tilesUsed = selectedTiles.map(i => playerTiles[i]);
+    console.log(tilesUsed);
     
-    // Check if word matches any target word
-    const isValidWord = gameState.targetWords.includes(wordToSubmit);
-    
-    if (isValidWord) {
-      // Calculate score
-      const wordScore = tilesUsed.reduce((sum, tile) => sum + tileScores[tile], 0);
-      
-      // Remove used tiles
-      const newTiles = gameState.player.tiles.filter((_, index) => 
-        !gameState.selectedTiles.includes(index)
-      );
-
-      setGameState(prev => ({
-        ...prev,
-        player: {
-          ...prev.player!,
-          tiles: newTiles,
-          score: prev.player!.score + wordScore,
-          tilesUsed: prev.player!.tilesUsed + tilesUsed.length
-        },
-        selectedTiles: [],
-        currentWord: '',
-        gameEvents: [...prev.gameEvents, `✅ "${wordToSubmit}" submitted for ${wordScore} points!`]
-      }));
-    } else {
-      setGameState(prev => ({
-        ...prev,
-        selectedTiles: [],
-        currentWord: '',
-        gameEvents: [...prev.gameEvents, `❌ "${wordToSubmit}" is not a valid target word`]
-      }));
-    }
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: TargetWords.abi,
+      functionName: "submitWord",
+      args: ["WORD", tilesUsed]
+    })
   };
 
   console.log(playerTiles, targetWord1)
