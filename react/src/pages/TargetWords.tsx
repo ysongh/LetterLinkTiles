@@ -184,7 +184,7 @@ const TargetWordsGame: React.FC = () => {
       address: import.meta.env.VITE_GAME_CONTRACT,
       abi: TargetWords.abi,
       functionName: "submitWord",
-      args: ["WORD", tilesUsed]
+      args: [tilesUsed]
     })
   };
 

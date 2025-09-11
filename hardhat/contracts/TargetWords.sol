@@ -83,22 +83,23 @@ contract TargetWords {
     emit PlayerJoined(msg.sender, initialTiles);
   }
 
-  function submitWord(string memory targetWord, uint8[] calldata tilesUsed) external {
-    if (_compareStrings(targetWord, targetWord1)) {
+  function submitWord(uint8[] calldata tilesUsed) external {
+    if (_compareTilesToWord(tilesUsed, targetWord1)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
-    } else if (_compareStrings(targetWord, targetWord2)) {
+      emit WordSubmitted(msg.sender, targetWord1);
+    } else if (_compareTilesToWord(tilesUsed, targetWord2)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
-    } else if (_compareStrings(targetWord, targetWord3)) {
+      emit WordSubmitted(msg.sender, targetWord2);
+    } else if (_compareTilesToWord(tilesUsed, targetWord3)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
+      emit WordSubmitted(msg.sender, targetWord3);
     }
-    
-    emit WordSubmitted(msg.sender, targetWord);
   }
 
   function addTargetWords(string memory _targetWord1, string memory _targetWord2, string memory _targetWord3) external onlyOwner{
@@ -140,8 +141,22 @@ contract TargetWords {
     return players[player].tiles;
   }
 
-  function _compareStrings(string memory a, string memory b) private pure returns (bool) {
-    return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+  function _compareTilesToWord(uint8[] calldata tilesUsed, string memory targetWord) private pure returns (bool) {
+    bytes memory wordBytes = bytes(targetWord);
+    
+    // Check if lengths match
+    if (tilesUsed.length != wordBytes.length) {
+      return false;
+    }
+    
+    // Compare each tile (assuming tiles are ASCII character codes)
+    for (uint i = 0; i < tilesUsed.length; i++) {
+      if (tilesUsed[i] != uint8(wordBytes[i])) {
+        return false;
+      }
+    }
+    
+    return true;
   }
 
   // Internal function to get a random tile
