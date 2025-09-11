@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 contract TargetWords {
   event PlayerJoined(address indexed player, uint8[] initialTiles);
   event WordSubmitted(address indexed player, string word);
+  event TilePurchased(address indexed player, uint8 tile);
 
   // Tile distribution (A=1, B=2, ..., Z=26)
   // Based on standard Scrabble distribution
@@ -52,6 +53,7 @@ contract TargetWords {
   string public targetWord1;
   string public targetWord2;
   string public targetWord3;
+  uint256 public tileCost = 0.001 ether;
 
   modifier onlyOwner() {
     require(msg.sender == owner, "Only owner can call this function");
@@ -103,6 +105,20 @@ contract TargetWords {
     targetWord1 = _targetWord1;
     targetWord2 = _targetWord2;
     targetWord3 = _targetWord3;
+  }
+
+  function buyTile() external payable {
+    require(msg.value >= tileCost, "Insufficient payment for tile");
+    
+    uint8 newTile = getRandomTile();
+    players[msg.sender].tiles.push(newTile);
+    
+    // Refund excess payment
+    if (msg.value > tileCost) {
+        payable(msg.sender).transfer(msg.value - tileCost);
+    }
+    
+    emit TilePurchased(msg.sender, newTile);
   }
 
   // Remove tiles from player's inventory

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Gamepad2, Trophy, Target, Shuffle, Send, Plus } from 'lucide-react';
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { parseEther } from "viem";
 
 import TargetWords from "../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
@@ -159,6 +160,19 @@ const TargetWordsGame: React.FC = () => {
     });
   };
 
+  const buyTile = async () => {
+    try {
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: TargetWords.abi,
+        functionName: "buyTile",
+        value: parseEther("0.001")
+      })
+    } catch (error) {
+      console.log('Failed to buy tile');
+    }
+  };
+
   // Submit word
   const submitWord = async () => {
     if (selectedTiles.length === 0) return;
@@ -220,6 +234,7 @@ const TargetWordsGame: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Your Tiles</h2>
                   <button
+                    onClick={buyTile}
                     className="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors"
                     title="Shuffle tiles"
                   >
