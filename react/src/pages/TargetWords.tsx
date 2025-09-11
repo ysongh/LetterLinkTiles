@@ -12,28 +12,9 @@ interface Player {
   tilesUsed: number;
 }
 
-interface GameState {
-  isConnected: boolean;
-  playerAddress: string | null;
-  player: Player | null;
-  targetWords: string[];
-  selectedTiles: number[];
-  currentWord: string;
-  gameEvents: string[];
-}
-
 const TargetWordsGame: React.FC = () => {
   const { address } = useAccount();
 
-  const [gameState, setGameState] = useState<GameState>({
-    isConnected: false,
-    playerAddress: null,
-    player: null,
-    targetWords: ['REACT', 'SMART', 'BLOCK'],
-    selectedTiles: [],
-    currentWord: '',
-    gameEvents: []
-  });
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
 
   // Letter mappings
@@ -50,18 +31,6 @@ const TargetWordsGame: React.FC = () => {
     1: 1, 2: 3, 3: 3, 4: 2, 5: 1, 6: 4, 7: 2, 8: 4, 9: 1, 10: 8,
     11: 5, 12: 1, 13: 3, 14: 1, 15: 1, 16: 3, 17: 10, 18: 1, 19: 1, 20: 1,
     21: 1, 22: 4, 23: 4, 24: 8, 25: 4, 26: 10
-  };
-
-  // Mock wallet connection
-  const connectWallet = async () => {
-    // Simulate wallet connection
-    const mockAddress = '0x1234...5678';
-    setGameState(prev => ({
-      ...prev,
-      isConnected: true,
-      playerAddress: mockAddress,
-      gameEvents: [...prev.gameEvents, `Connected wallet: ${mockAddress}`]
-    }));
   };
 
   const { data: playerTiles = [] } = useReadContract({
@@ -102,47 +71,6 @@ const TargetWordsGame: React.FC = () => {
       abi: TargetWords.abi,
       functionName: "joinGame",
     })
-    
-    // Simulate getting 7 random tiles
-    const getRandomTiles = (): number[] => {
-      const tiles = [];
-      const tilePool = [
-        1,1,1,1,1,1,1,1,1, // A
-        2,2, 3,3, 4,4,4,4, // B,C,D
-        5,5,5,5,5,5,5,5,5,5,5,5, // E
-        6,6, 7,7,7, 8,8, // F,G,H
-        9,9,9,9,9,9,9,9,9, // I
-        10, 11, 12,12,12,12, // J,K,L
-        13,13, 14,14,14,14,14,14, // M,N
-        15,15,15,15,15,15,15,15, // O
-        16,16, 17, // P,Q
-        18,18,18,18,18,18, // R
-        19,19,19,19, // S
-        20,20,20,20,20,20, // T
-        21,21,21,21, 22,22, 23,23, // U,V,W
-        24, 25,25, 26 // X,Y,Z
-      ];
-      
-      for (let i = 0; i < 7; i++) {
-        const randomIndex = Math.floor(Math.random() * tilePool.length);
-        tiles.push(tilePool[randomIndex]);
-      }
-      return tiles;
-    };
-
-    const initialTiles = getRandomTiles();
-    const newPlayer: Player = {
-      isActive: true,
-      tiles: initialTiles,
-      score: 0,
-      tilesUsed: 0
-    };
-
-    setGameState(prev => ({
-      ...prev,
-      player: newPlayer,
-      gameEvents: [...prev.gameEvents, `Joined game! Received tiles: ${initialTiles.map(numberToLetter).join(', ')}`]
-    }));
   };
 
   // Toggle tile selection
@@ -206,7 +134,7 @@ const TargetWordsGame: React.FC = () => {
           </p>
         </div>
 
-        {gameState.player?.isActive && (
+        {playerTiles && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Game Board */}
             <div className="lg:col-span-2 space-y-6">
@@ -271,7 +199,7 @@ const TargetWordsGame: React.FC = () => {
                        
                         <span className="ml-3 text-sm text-gray-400">
                           ({selectedTiles.reduce((sum, i) => 
-                            sum + tileScores[gameState.player!.tiles[i]], 0)} points)
+                            sum + tileScores[playerTiles[i]], 0)} points)
                         </span>
                       </div>
                       <button
@@ -298,15 +226,15 @@ const TargetWordsGame: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span>Score:</span>
-                    <span className="font-bold text-yellow-400">{gameState.player.score}</span>
+                    <span className="font-bold text-yellow-400">0</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tiles Used:</span>
-                    <span>{gameState.player.tilesUsed}</span>
+                    <span>0</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tiles Left:</span>
-                    <span>{gameState.player.tiles.length}</span>
+                    <span>0</span>
                   </div>
                 </div>
               </div>
@@ -315,11 +243,7 @@ const TargetWordsGame: React.FC = () => {
               <div className="bg-gray-800/50 backdrop-blur rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-3">Game Log</h3>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {gameState.gameEvents.slice(-10).reverse().map((event, index) => (
-                    <div key={index} className="text-sm p-2 bg-gray-700/50 rounded text-gray-300">
-                      {event}
-                    </div>
-                  ))}
+                  
                 </div>
               </div>
             </div>
@@ -338,7 +262,7 @@ const TargetWordsGame: React.FC = () => {
           </div>
         )}
 
-        {address && !gameState.player?.isActive && (
+        {address && !playerTiles && (
           <div className="text-center mt-12">
             <div className="bg-gray-800/50 backdrop-blur rounded-lg p-8 max-w-md mx-auto">
               <Plus size={64} className="text-green-400 mx-auto mb-4" />
