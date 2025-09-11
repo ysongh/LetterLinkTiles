@@ -33,6 +33,7 @@ const TargetWordsGame: React.FC = () => {
     currentWord: '',
     gameEvents: []
   });
+  const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
 
   // Letter mappings
   const numberToLetter = (num: number): string => {
@@ -145,34 +146,25 @@ const TargetWordsGame: React.FC = () => {
 
   // Toggle tile selection
   const toggleTileSelection = (tileIndex: number) => {
-    const tile = gameState.player?.tiles[tileIndex];
+    const tile = playerTiles[tileIndex];
     if (!tile) return;
 
-    setGameState(prev => {
-      const isSelected = prev.selectedTiles.includes(tileIndex);
-      const newSelectedTiles = isSelected 
-        ? prev.selectedTiles.filter(i => i !== tileIndex)
-        : [...prev.selectedTiles, tileIndex];
-      
-      // Update current word based on selected tiles
-      const newWord = newSelectedTiles
-        .map(i => numberToLetter(prev.player!.tiles[i]))
-        .join('');
-
-      return {
-        ...prev,
-        selectedTiles: newSelectedTiles,
-        currentWord: newWord
-      };
+    setSelectedTiles(prev => {
+      const isSelected = prev.includes(tileIndex);
+      if (isSelected) {
+        return prev.filter(index => index !== tileIndex);
+      } else {
+        return [...prev, tileIndex];
+      }
     });
   };
 
   // Submit word
   const submitWord = async () => {
-    if (!gameState.player || gameState.selectedTiles.length === 0) return;
+    if (!gameState.player || selectedTiles.length === 0) return;
 
     const wordToSubmit = gameState.currentWord;
-    const tilesUsed = gameState.selectedTiles.map(i => gameState.player!.tiles[i]);
+    const tilesUsed = selectedTiles.map(i => playerTiles!.tiles[i]);
     
     // Check if word matches any target word
     const isValidWord = gameState.targetWords.includes(wordToSubmit);
@@ -266,7 +258,7 @@ const TargetWordsGame: React.FC = () => {
                       key={index}
                       onClick={() => toggleTileSelection(index)}
                       className={`aspect-square rounded-lg border-2 text-xl font-bold transition-all transform hover:scale-105 ${
-                        gameState.selectedTiles.includes(index)
+                        selectedTiles.includes(index)
                           ? 'bg-yellow-400 text-black border-yellow-300 scale-105'
                           : 'bg-gray-700 border-gray-600 hover:bg-gray-600'
                       }`}
@@ -280,13 +272,16 @@ const TargetWordsGame: React.FC = () => {
                 </div>
 
                 {/* Current Word Display */}
-                {gameState.currentWord && (
+                {selectedTiles.length && (
                   <div className="bg-gray-700 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-lg font-mono">{gameState.currentWord}</span>
+                        {selectedTiles.map((s, index) => (
+                          <span key={index} className="text-lg font-mono">{numberToLetter(playerTiles[s])}</span>
+                        ))}
+                       
                         <span className="ml-3 text-sm text-gray-400">
-                          ({gameState.selectedTiles.reduce((sum, i) => 
+                          ({selectedTiles.reduce((sum, i) => 
                             sum + tileScores[gameState.player!.tiles[i]], 0)} points)
                         </span>
                       </div>
