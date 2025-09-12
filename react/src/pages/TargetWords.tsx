@@ -3,6 +3,7 @@ import { Gamepad2, Trophy, Target, Shuffle, Send, Plus } from 'lucide-react';
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
+import EditTargetWords from '../components/targetWords/EditTargetWords';
 import TargetWords from "../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
 interface Player {
@@ -249,6 +250,8 @@ const TargetWordsGame: React.FC = () => {
             </div>
           </div>
         )}
+
+        <EditTargetWords />
 
         {!address && (
           <div className="text-center mt-12">
