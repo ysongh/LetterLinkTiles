@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Gamepad2, Trophy, Target, Shuffle, Send, Plus } from 'lucide-react';
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
 import EditTargetWords from '../components/targetWords/EditTargetWords';
@@ -15,8 +15,13 @@ interface Player {
 
 const TargetWordsGame: React.FC = () => {
   const { address } = useAccount();
+  const { data: blockNumber } = useBlockNumber({ watch: true })
 
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
+
+  useEffect(() => {
+    playerTilesRefetch();
+  }, [blockNumber])
 
   // Letter mappings
   const numberToLetter = (num: number): string => {
@@ -34,12 +39,12 @@ const TargetWordsGame: React.FC = () => {
     21: 1, 22: 4, 23: 4, 24: 8, 25: 4, 26: 10
   };
 
-  const { data: playerTiles = [] } = useReadContract({
+  const { data: playerTiles = [], refetch: playerTilesRefetch } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: TargetWords.abi,
     functionName: 'getPlayerTiles',
     args: [address]
-  }) as { data: any };
+  }) as { data: BigInt[], refetch: () => void  };
 
   const { data: owner } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
@@ -51,19 +56,19 @@ const TargetWordsGame: React.FC = () => {
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: TargetWords.abi,
     functionName: 'targetWord1',
-  }) as { data: any };
+  }) as { data: string };
 
   const { data: targetWord2 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: TargetWords.abi,
     functionName: 'targetWord2',
-  }) as { data: any };
+  }) as { data: string };
 
   const { data: targetWord3 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: TargetWords.abi,
     functionName: 'targetWord3',
-  }) as { data: any };
+  }) as { data: string };
 
   const {
     writeContract,
