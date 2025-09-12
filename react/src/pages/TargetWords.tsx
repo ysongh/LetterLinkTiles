@@ -41,6 +41,12 @@ const TargetWordsGame: React.FC = () => {
     args: [address]
   }) as { data: any };
 
+  const { data: owner } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: TargetWords.abi,
+    functionName: 'owner',
+  }) as { data: string };
+
   const { data: targetWord1 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: TargetWords.abi,
@@ -117,6 +123,19 @@ const TargetWordsGame: React.FC = () => {
     })
   };
 
+  const changeTargetWords = async (tw1: string, tw2: string, tw3: string) => {
+    try {
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: TargetWords.abi,
+        functionName: "addTargetWords",
+        args: [tw1, tw2, tw3]
+      })
+    } catch (error) {
+      console.log('Failed to change target word');
+    }
+  };
+
   console.log(playerTiles, targetWord1)
 
   return (
@@ -135,7 +154,7 @@ const TargetWordsGame: React.FC = () => {
           </p>
         </div>
 
-        {playerTiles && (
+        {playerTiles.length && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Game Board */}
             <div className="lg:col-span-2 space-y-6">
@@ -251,8 +270,6 @@ const TargetWordsGame: React.FC = () => {
           </div>
         )}
 
-        <EditTargetWords />
-
         {!address && (
           <div className="text-center mt-12">
             <div className="bg-gray-800/50 backdrop-blur rounded-lg p-8 max-w-md mx-auto">
@@ -265,7 +282,7 @@ const TargetWordsGame: React.FC = () => {
           </div>
         )}
 
-        {address && !playerTiles && (
+        {address && !playerTiles.length && (
           <div className="text-center mt-12">
             <div className="bg-gray-800/50 backdrop-blur rounded-lg p-8 max-w-md mx-auto">
               <Plus size={64} className="text-green-400 mx-auto mb-4" />
@@ -283,6 +300,8 @@ const TargetWordsGame: React.FC = () => {
             </div>
           </div>
         )}
+
+        {owner === address && <EditTargetWords changeTargetWords={changeTargetWords} />}
       </div>
     </div>
   );

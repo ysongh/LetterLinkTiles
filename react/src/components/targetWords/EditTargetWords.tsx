@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Target } from 'lucide-react';
 
-function EditTargetWords() {
+function EditTargetWords({ changeTargetWords } : { changeTargetWords: Function}) {
   const [newWord1, setNewWord1] = useState<string>();
   const [newWord2, setNewWord2] = useState<string>();
   const [newWord3, setNewWord3] = useState<string>();
@@ -56,6 +56,7 @@ function EditTargetWords() {
           </div>
         </div>
         <button
+          onClick={() => changeTargetWords(newWord1, newWord2, newWord3)}
           className="bg-orange-600 hover:bg-orange-700 px-6 py-2 rounded-lg transition-colors flex items-center gap-2"
         >
           <Target size={16} />
