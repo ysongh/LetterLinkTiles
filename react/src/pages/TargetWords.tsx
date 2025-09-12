@@ -6,13 +6,6 @@ import { parseEther } from "viem";
 import EditTargetWords from '../components/targetWords/EditTargetWords';
 import TargetWords from "../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
-interface Player {
-  isActive: boolean;
-  tiles: number[];
-  score: number;
-  tilesUsed: number;
-}
-
 const TargetWordsGame: React.FC = () => {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true })
@@ -26,10 +19,6 @@ const TargetWordsGame: React.FC = () => {
   // Letter mappings
   const numberToLetter = (num: number): string => {
     return String.fromCharCode(64 + num); // A=1 -> 'A', B=2 -> 'B', etc.
-  };
-
-  const letterToNumber = (letter: string): number => {
-    return letter.charCodeAt(0) - 64;
   };
 
   // Tile scores matching contract
@@ -206,25 +195,25 @@ const TargetWordsGame: React.FC = () => {
                       }`}
                     >
                       <div className="flex flex-col items-center justify-center h-full">
-                        <span>{numberToLetter(tile)}</span>
-                        <span className="text-xs opacity-70">{tileScores[tile]}</span>
+                        <span>{numberToLetter(Number(tile))}</span>
+                        <span className="text-xs opacity-70">{tileScores[Number(tile)]}</span>
                       </div>
                     </button>
                   ))}
                 </div>
 
                 {/* Current Word Display */}
-                {selectedTiles.length && (
+                {selectedTiles.length > 0 && (
                   <div className="bg-gray-700 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between">
                       <div>
                         {selectedTiles.map((s, index) => (
-                          <span key={index} className="text-lg font-mono">{numberToLetter(playerTiles[s])}</span>
+                          <span key={index} className="text-lg font-mono">{numberToLetter(playerTiles[Number(s)])}</span>
                         ))}
                        
                         <span className="ml-3 text-sm text-gray-400">
                           ({selectedTiles.reduce((sum, i) => 
-                            sum + tileScores[playerTiles[i]], 0)} points)
+                            sum + tileScores[Number(playerTiles[i])], 0)} points)
                         </span>
                       </div>
                       <button
