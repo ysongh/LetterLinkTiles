@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 contract StackTiles {
   event PlayerJoined(address indexed player, uint8[] initialTiles);
-  event WordSubmitted(address indexed player, string word);
+  event WordSubmitted(address indexed player, uint8 tile);
   event TilePurchased(address indexed player, uint8 tile);
 
   // Tile distribution (A=1, B=2, ..., Z=26)
@@ -100,19 +100,35 @@ contract StackTiles {
     emit TilePurchased(msg.sender, newTile);
   }
 
-  // Remove tiles from player's inventory
-  function removeTilesFromPlayer(address player, uint8[] memory tilesUsed) internal {
-    for (uint i = 0; i < tilesUsed.length; i++) {
-      for (uint j = 0; j < players[player].tiles.length; j++) {
-        if (players[player].tiles[j] == tilesUsed[i]) {
-          // Remove tile by swapping with last element and popping
-          players[player].tiles[j] = players[player].tiles[players[player].tiles.length - 1];
-          players[player].tiles.pop();
-          break;
-        }
+  function submitTile(uint8 tileUsed) external {
+    if (tileUsed == targetLetter1) {
+      uint256 wordScore = calculateWordScore(tileUsed);
+      players[msg.sender].score += wordScore;
+      removeTilesFromPlayer(msg.sender, tileUsed);
+    } else if (tileUsed == targetLetter2) {
+      uint256 wordScore = calculateWordScore(tileUsed);
+      players[msg.sender].score += wordScore;
+      removeTilesFromPlayer(msg.sender, tileUsed);
+    } else if (tileUsed == targetLetter3) {
+      uint256 wordScore = calculateWordScore(tileUsed);
+      players[msg.sender].score += wordScore;
+      removeTilesFromPlayer(msg.sender, tileUsed);
+    }
+    
+    emit WordSubmitted(msg.sender, tileUsed);
+  }
+
+  // Remove tile from player's inventory
+  function removeTilesFromPlayer(address player, uint8 tileUsed) internal {
+    for (uint j = 0; j < players[player].tiles.length; j++) {
+      if (players[player].tiles[j] == tileUsed) {
+        // Remove tile by swapping with last element and popping
+        players[player].tiles[j] = players[player].tiles[players[player].tiles.length - 1];
+        players[player].tiles.pop();
+        break;
       }
     }
-    players[player].tilesUsed += tilesUsed.length;
+    players[player].tilesUsed += 1;
   }
 
   function getPlayerTiles(address player) external view returns (uint8[] memory) {
