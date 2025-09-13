@@ -104,14 +104,17 @@ contract StackTiles {
     if (tileUsed == targetLetter1) {
       uint256 wordScore = calculateWordScore(tileUsed);
       players[msg.sender].score += wordScore;
+      targetLetter1 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
     } else if (tileUsed == targetLetter2) {
       uint256 wordScore = calculateWordScore(tileUsed);
       players[msg.sender].score += wordScore;
+      targetLetter2 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
     } else if (tileUsed == targetLetter3) {
       uint256 wordScore = calculateWordScore(tileUsed);
       players[msg.sender].score += wordScore;
+      targetLetter3 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
     }
     
