@@ -50,9 +50,9 @@ contract StackTiles {
   mapping(address => Player) public players;
   address[] public activePlayers;
   address public owner;
-  string public targetWord1;
-  string public targetWord2;
-  string public targetWord3;
+  string public targetLetter1;
+  string public targetLetter2;
+  string public targetLetter3;
   uint256 public tileCost = 0.001 ether;
 
   modifier onlyOwner() {
@@ -64,7 +64,7 @@ contract StackTiles {
     owner = msg.sender;
   }
 
-  // Join the game and receive 7 random tiles
+  // Join the game and receive 5 random tiles
   function joinGame() external {
     require(!players[msg.sender].isActive, "Player already active");
     
@@ -73,8 +73,8 @@ contract StackTiles {
     players[msg.sender].tilesUsed = 0;
     
     // Give 7 random tiles
-    uint8[] memory initialTiles = new uint8[](7);
-    for (uint i = 0; i < 7; i++) {
+    uint8[] memory initialTiles = new uint8[](5);
+    for (uint i = 0; i < 5; i++) {
       initialTiles[i] = getRandomTile();
       players[msg.sender].tiles.push(initialTiles[i]);
     }
@@ -83,29 +83,10 @@ contract StackTiles {
     emit PlayerJoined(msg.sender, initialTiles);
   }
 
-  function submitWord(uint8[] calldata tilesUsed) external {
-    if (_compareTilesToWord(tilesUsed, targetWord1)) {
-      uint256 wordScore = calculateWordScore(tilesUsed);
-      players[msg.sender].score += wordScore;
-      removeTilesFromPlayer(msg.sender, tilesUsed);
-      emit WordSubmitted(msg.sender, targetWord1);
-    } else if (_compareTilesToWord(tilesUsed, targetWord2)) {
-      uint256 wordScore = calculateWordScore(tilesUsed);
-      players[msg.sender].score += wordScore;
-      removeTilesFromPlayer(msg.sender, tilesUsed);
-      emit WordSubmitted(msg.sender, targetWord2);
-    } else if (_compareTilesToWord(tilesUsed, targetWord3)) {
-      uint256 wordScore = calculateWordScore(tilesUsed);
-      players[msg.sender].score += wordScore;
-      removeTilesFromPlayer(msg.sender, tilesUsed);
-      emit WordSubmitted(msg.sender, targetWord3);
-    }
-  }
-
-  function addTargetWords(string memory _targetWord1, string memory _targetWord2, string memory _targetWord3) external onlyOwner{
-    targetWord1 = _targetWord1;
-    targetWord2 = _targetWord2;
-    targetWord3 = _targetWord3;
+  function addTargetLetters(string memory _targetLetter1, string memory _targetLetter2, string memory _targetLetter3) external onlyOwner{
+    targetLetter1 = _targetLetter1;
+    targetLetter2 = _targetLetter2;
+    targetLetter3 = _targetLetter3;
   }
 
   function buyTile() external payable {
@@ -141,24 +122,6 @@ contract StackTiles {
     return players[player].tiles;
   }
 
-  function _compareTilesToWord(uint8[] calldata tilesUsed, string memory targetWord) private pure returns (bool) {
-    bytes memory wordBytes = bytes(targetWord);
-    
-    // Check if lengths match
-    if (tilesUsed.length != wordBytes.length) {
-      return false;
-    }
-    
-    // Compare each tile (assuming tiles are ASCII character codes)
-    for (uint i = 0; i < tilesUsed.length; i++) {
-      if (tilesUsed[i] != uint8(wordBytes[i])) {
-        return false;
-      }
-    }
-    
-    return true;
-  }
-
   // Internal function to get a random tile
   function getRandomTile() internal view returns (uint8) {
     uint256 randomIndex = uint256(keccak256(abi.encodePacked(
@@ -170,12 +133,10 @@ contract StackTiles {
     return tilePool[randomIndex];
   }
 
-  // Calculate word score based on tile values
-  function calculateWordScore(uint8[] memory tilesUsed) internal view returns (uint256) {
+  // Calculate word score based on tile value
+  function calculateWordScore(uint8 tileUsed) internal view returns (uint256) {
     uint256 score = 0;
-    for (uint i = 0; i < tilesUsed.length; i++) {
-      score += tileScores[tilesUsed[i]];
-    }
+    score += tileScores[tileUsed];
     return score;
   }
 }
