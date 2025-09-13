@@ -50,9 +50,9 @@ contract StackTiles {
   mapping(address => Player) public players;
   address[] public activePlayers;
   address public owner;
-  string public targetLetter1;
-  string public targetLetter2;
-  string public targetLetter3;
+  uint8 public targetLetter1;
+  uint8 public targetLetter2;
+  uint8 public targetLetter3;
   uint256 public tileCost = 0.001 ether;
 
   modifier onlyOwner() {
@@ -62,6 +62,9 @@ contract StackTiles {
 
   constructor() {
     owner = msg.sender;
+    targetLetter1 = getRandomTile();
+    targetLetter2 = getRandomTile();
+    targetLetter3 = getRandomTile();
   }
 
   // Join the game and receive 5 random tiles
@@ -81,12 +84,6 @@ contract StackTiles {
     
     activePlayers.push(msg.sender);
     emit PlayerJoined(msg.sender, initialTiles);
-  }
-
-  function addTargetLetters(string memory _targetLetter1, string memory _targetLetter2, string memory _targetLetter3) external onlyOwner{
-    targetLetter1 = _targetLetter1;
-    targetLetter2 = _targetLetter2;
-    targetLetter3 = _targetLetter3;
   }
 
   function buyTile() external payable {
