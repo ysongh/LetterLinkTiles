@@ -37,9 +37,6 @@ contract StackTiles {
     26 // Z (1 tile)
   ];
 
-  // Tile scores (A=1, B=3, C=3, D=2, E=1, F=4, G=2, H=4, I=1, J=8, K=5, L=1, M=3, N=1, O=1, P=3, Q=10, R=1, S=1, T=1, U=1, V=4, W=4, X=8, Y=4, Z=10)
-  uint8[27] private tileScores = [0, 1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10];
-
   // Structs
   struct Player {
     bool isActive;
@@ -102,17 +99,16 @@ contract StackTiles {
 
   function submitTile(uint8 tileUsed) external {
     if (tileUsed == targetLetter1) {
-      uint256 wordScore = calculateWordScore(tileUsed);
-      players[msg.sender].score += wordScore;
+      players[msg.sender].score += 1;
       targetLetter1 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
     } else if (tileUsed == targetLetter2) {
-      uint256 wordScore = calculateWordScore(tileUsed);
+      uint256 wordScore = 1;
       players[msg.sender].score += wordScore;
       targetLetter2 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
     } else if (tileUsed == targetLetter3) {
-      uint256 wordScore = calculateWordScore(tileUsed);
+      uint256 wordScore = 1;
       players[msg.sender].score += wordScore;
       targetLetter3 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
@@ -147,12 +143,5 @@ contract StackTiles {
     ))) % tilePool.length;
     
     return tilePool[randomIndex];
-  }
-
-  // Calculate word score based on tile value
-  function calculateWordScore(uint8 tileUsed) internal view returns (uint256) {
-    uint256 score = 0;
-    score += tileScores[tileUsed];
-    return score;
   }
 }
