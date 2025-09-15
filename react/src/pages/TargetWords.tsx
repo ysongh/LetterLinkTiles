@@ -4,6 +4,7 @@ import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "w
 import { parseEther } from "viem";
 
 import EditTargetWords from '../components/targetWords/EditTargetWords';
+import TradeInterface from '../components/targetWords/TradeInterface';
 import TargetWords from "../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
 const TargetWordsGame: React.FC = () => {
@@ -217,6 +218,11 @@ const TargetWordsGame: React.FC = () => {
                     </button>
                   ))}
                 </div>
+
+                {/* Trade Interface */}
+                {isTradeMode && (
+                  <TradeInterface selectedTiles={selectedTiles} />
+                )}
 
                 {/* Current Word Display */}
                 {selectedTiles.length > 0 && (
