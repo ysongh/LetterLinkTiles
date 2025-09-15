@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Gamepad2, Trophy, Target, Shuffle, Send, Plus } from 'lucide-react';
+import { ArrowLeftRight, Gamepad2, Trophy, Target, Shuffle, Send, Plus, X } from 'lucide-react';
 import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
@@ -11,6 +11,7 @@ const TargetWordsGame: React.FC = () => {
   const { data: blockNumber } = useBlockNumber({ watch: true })
 
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
+  const [isTradeMode, setIsTradeMode] = useState<boolean>(false);
 
   useEffect(() => {
     playerTilesRefetch();
@@ -174,14 +175,29 @@ const TargetWordsGame: React.FC = () => {
               {/* Player Tiles */}
               <div className="bg-gray-800/50 backdrop-blur rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">Your Tiles</h2>
+                  <h2 className="text-xl font-semibold">
+                    {isTradeMode ? 'Select Tile to Trade' : 'Your Tiles'}
+                  </h2>
                   <button
-                    onClick={buyTile}
-                    className="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors"
-                    title="Shuffle tiles"
-                  >
-                    <Shuffle size={20} />
-                  </button>
+                      onClick={() => setIsTradeMode(!isTradeMode)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        isTradeMode
+                          ? 'bg-red-600 hover:bg-red-700' 
+                          : 'bg-orange-600 hover:bg-orange-700'
+                      }`}
+                      title={isTradeMode ? 'Cancel trade' : 'Trade tiles'}
+                    >
+                      {isTradeMode ? <X size={20} /> : <ArrowLeftRight size={20} />}
+                    </button>
+                    {!isTradeMode && (
+                      <button
+                        onClick={buyTile}
+                        className="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors"
+                        title="Shuffle tiles"
+                      >
+                        <Shuffle size={20} />
+                      </button>
+                    )}
                 </div>
                 <div className="grid grid-cols-7 gap-3 mb-4">
                   {playerTiles.map((tile, index) => (
