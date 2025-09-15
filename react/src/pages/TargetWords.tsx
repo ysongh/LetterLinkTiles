@@ -133,6 +133,20 @@ const TargetWordsGame: React.FC = () => {
     }
   };
 
+  const createTradeOffer = (desiredTradeTile: Number) => {
+    try {
+      console.log(selectedTile, desiredTradeTile);
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: TargetWords.abi,
+        functionName: "createTradeOffer",
+        args: [selectedTile, desiredTradeTile]
+      })
+    } catch (error) {
+      console.log('Failed to create trade offer');
+    }
+  }
+
   console.log(playerTiles, targetWord1)
 
   return (
@@ -241,7 +255,8 @@ const TargetWordsGame: React.FC = () => {
                 {isTradeMode && (
                   <TradeInterface
                     selectedTile={selectedTile}
-                    playerTiles={playerTiles} />
+                    playerTiles={playerTiles}
+                    createTradeOffer={createTradeOffer} />
                 )}
 
                 {/* Current Word Display */}

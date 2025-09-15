@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
 
-function TradeInterface({ selectedTile, playerTiles } : { selectedTile: number, playerTiles: BigInt[] }) {
+function TradeInterface({ selectedTile, playerTiles, createTradeOffer } : { selectedTile: number, playerTiles: BigInt[], createTradeOffer: Function }) {
   const [desiredTradeTile, setDesiredTradeTile] = useState<string>("");
 
   const numberToLetter = (num: number): string => {
     return String.fromCharCode(64 + num); // A=1 -> 'A', B=2 -> 'B', etc.
+  };
+
+  const letterToNumber = (letter: string): number => {
+    return letter.charCodeAt(0) - 64;
   };
 
   return (
@@ -25,6 +29,7 @@ function TradeInterface({ selectedTile, playerTiles } : { selectedTile: number, 
           />
         </div>
         <button
+          onClick={() => createTradeOffer(letterToNumber(desiredTradeTile))}
           disabled={selectedTile === -1 || !desiredTradeTile}
           className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition-colors flex items-center gap-2 mt-6"
         >
