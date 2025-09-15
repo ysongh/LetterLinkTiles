@@ -12,6 +12,7 @@ const TargetWordsGame: React.FC = () => {
   const { data: blockNumber } = useBlockNumber({ watch: true })
 
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
+  const [selectedTile, setSelectedTile] = useState<number>(-1);
   const [isTradeMode, setIsTradeMode] = useState<boolean>(false);
 
   useEffect(() => {
@@ -200,7 +201,24 @@ const TargetWordsGame: React.FC = () => {
                       </button>
                     )}
                 </div>
-                <div className="grid grid-cols-7 gap-3 mb-4">
+                {isTradeMode ? <div className="grid grid-cols-7 gap-3 mb-4">
+                  {playerTiles.map((tile, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedTile(index)}
+                      className={`aspect-square rounded-lg border-2 text-xl font-bold transition-all transform hover:scale-105 ${
+                        selectedTile === index
+                          ? 'bg-yellow-400 text-black border-yellow-300 scale-105'
+                          : 'bg-gray-700 border-gray-600 hover:bg-gray-600'
+                      }`}
+                    >
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <span>{numberToLetter(Number(tile))}</span>
+                        <span className="text-xs opacity-70">{tileScores[Number(tile)]}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div> : <div className="grid grid-cols-7 gap-3 mb-4">
                   {playerTiles.map((tile, index) => (
                     <button
                       key={index}
@@ -217,15 +235,17 @@ const TargetWordsGame: React.FC = () => {
                       </div>
                     </button>
                   ))}
-                </div>
+                </div>}
 
                 {/* Trade Interface */}
                 {isTradeMode && (
-                  <TradeInterface selectedTiles={selectedTiles} />
+                  <TradeInterface
+                    selectedTile={selectedTile}
+                    playerTiles={playerTiles} />
                 )}
 
                 {/* Current Word Display */}
-                {selectedTiles.length > 0 && (
+                {!isTradeMode && selectedTiles.length > 0 && (
                   <div className="bg-gray-700 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between">
                       <div>
