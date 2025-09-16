@@ -140,7 +140,7 @@ const TargetWordsGame: React.FC = () => {
         address: import.meta.env.VITE_GAME_CONTRACT,
         abi: TargetWords.abi,
         functionName: "createTradeOffer",
-        args: [selectedTile, desiredTradeTile]
+        args: [playerTiles[selectedTile], desiredTradeTile]
       })
     } catch (error) {
       console.log('Failed to create trade offer');
