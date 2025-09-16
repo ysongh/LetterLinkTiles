@@ -5,6 +5,7 @@ import { parseEther } from "viem";
 
 import EditTargetWords from '../components/targetWords/EditTargetWords';
 import TradeInterface from '../components/targetWords/TradeInterface';
+import TradingTable from '../components/targetWords/TradingTable';
 import TargetWords from "../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
 const TargetWordsGame: React.FC = () => {
@@ -284,6 +285,8 @@ const TargetWordsGame: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              <TradingTable playerTiles={playerTiles} />
             </div>
 
             {/* Sidebar */}
