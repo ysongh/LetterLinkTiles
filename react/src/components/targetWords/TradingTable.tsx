@@ -1,5 +1,5 @@
 import { ArrowRightLeft } from 'lucide-react';
-import { useReadContract } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 
 import TargetWords from "../../artifacts/contracts/TargetWords.sol/TargetWords.json";
 
@@ -19,8 +19,6 @@ function TradingTable({ playerTiles } : { playerTiles: BigInt[] }) {
     abi: TargetWords.abi,
     functionName: 'getActiveTradeOffers',
   }) as { data: BigInt[] };
-
-  console.log(offers)
 
   return (
     <div className="bg-gray-800/50 backdrop-blur rounded-lg p-6">
@@ -63,7 +61,20 @@ function TradingItem({ id, playerTiles } : { id: BigInt, playerTiles: BigInt[] }
     args: [id]
   }) as { data: any[] };
 
-  console.log(offectData);
+  const {
+    writeContract,
+    data: txHash,
+    isPending
+  } = useWriteContract();
+
+  const acceptTradeOffer = async () => {
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: TargetWords.abi,
+      functionName: "acceptTradeOffer",
+      args: [id]
+    })
+  };
 
   if (offectData.length === 0) return null;
 
@@ -101,6 +112,7 @@ function TradingItem({ id, playerTiles } : { id: BigInt, playerTiles: BigInt[] }
       </td>
       <td className="py-3 px-2 text-center">
         <button
+          onClick={acceptTradeOffer}
           className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
             offectData[3] && playerTiles.includes(BigInt(offectData[2]))
               ? 'bg-blue-600 hover:bg-blue-700 text-white'
