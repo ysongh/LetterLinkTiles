@@ -41,6 +41,12 @@ function Landing() {
           >
             Play Target Words
           </button>
+           <button
+            onClick={() => navigate("/stacktiles")}
+            className="mt-3 flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-10 py-2 rounded-lg font-semibold transition-all disabled:opacity-50"
+          >
+            Play Stack Tiles
+          </button>
         </center>
       </div>
     </div>
