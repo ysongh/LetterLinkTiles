@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Coins, Target, Trophy, User, Zap, Plus, Send } from 'lucide-react';
-import { useWriteContract } from "wagmi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 
 import StackTiles from "../artifacts/contracts/StackTiles.sol/StackTiles.json";
 
@@ -43,6 +43,8 @@ const getTileRarity = (tileNum: number): string => {
 };
 
 const StackTilesGame: React.FC = () => {
+  const { address } = useAccount();
+
   const [gameState, setGameState] = useState<GameState>({
     targetLetter1: 1,
     targetLetter2: 5,
@@ -61,6 +63,13 @@ const StackTilesGame: React.FC = () => {
   const [selectedTile, setSelectedTile] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
+
+  const { data: playerTiles = [] } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: StackTiles.abi,
+    functionName: 'getPlayerTiles',
+    args: [address]
+  }) as { data: any };
 
   const { writeContract } = useWriteContract();
 
@@ -328,17 +337,17 @@ const StackTilesGame: React.FC = () => {
                 <Coins className="w-6 h-6 text-yellow-400" />
                 <h2 className="text-xl font-semibold text-white">Your Tiles</h2>
                 <span className="bg-yellow-500 text-black px-2 py-1 rounded-full text-sm font-bold">
-                  {gameState.playerData.tiles.length}
+                  {playerTiles.length}
                 </span>
               </div>
 
-              {gameState.playerData.tiles.length === 0 ? (
+              {playerTiles.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-400">No tiles yet. Join the game to get started!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-3">
-                  {gameState.playerData.tiles.map((tile, index) => (
+                  {playerTiles.map((tile, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedTile(tile)}
