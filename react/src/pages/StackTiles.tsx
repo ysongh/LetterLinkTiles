@@ -166,55 +166,22 @@ const StackTilesGame: React.FC = () => {
     }
   }, [gameState.playerData.isActive]);
 
-  const submitTile = useCallback(async (tileToSubmit: number) => {
-    if (!gameState.playerData.isActive || selectedTile === null) return;
-    
+  const submitTile = async () => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const { targetLetter1, targetLetter2, targetLetter3 } = gameState;
-      let isMatch = false;
-      let newTargets = { targetLetter1, targetLetter2, targetLetter3 };
-      
-      if (tileToSubmit === targetLetter1) {
-        isMatch = true;
-        newTargets.targetLetter1 = Math.floor(Math.random() * 26) + 1;
-      } else if (tileToSubmit === targetLetter2) {
-        isMatch = true;
-        newTargets.targetLetter2 = Math.floor(Math.random() * 26) + 1;
-      } else if (tileToSubmit === targetLetter3) {
-        isMatch = true;
-        newTargets.targetLetter3 = Math.floor(Math.random() * 26) + 1;
-      }
-      
-      if (isMatch) {
-        const newTiles = gameState.playerData.tiles.filter((_, index) => 
-          index !== gameState.playerData.tiles.indexOf(tileToSubmit)
-        );
-        
-        setGameState(prev => ({
-          ...prev,
-          ...newTargets,
-          playerData: {
-            ...prev.playerData,
-            tiles: newTiles,
-            score: prev.playerData.score + 1,
-            tilesUsed: prev.playerData.tilesUsed + 1
-          }
-        }));
-        setMessage(`Perfect match! +1 point for ${numberToLetter(tileToSubmit)}`);
-      } else {
-        setMessage(`No match for ${numberToLetter(tileToSubmit)}. Try again!`);
-      }
-      
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: StackTiles.abi,
+        functionName: "submitTile",
+        args: [selectedTile]
+      })
       setSelectedTile(null);
     } catch (error) {
       setMessage('Failed to submit tile');
     } finally {
       setIsLoading(false);
     }
-  }, [gameState, selectedTile]);
+  };
 
   // Clear message after 3 seconds
   useEffect(() => {
