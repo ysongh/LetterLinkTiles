@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Coins, Target, Trophy, User, Zap, Plus, Send } from 'lucide-react';
+import { useWriteContract } from "wagmi";
+
+import StackTiles from "../artifacts/contracts/StackTiles.sol/StackTiles.json";
 
 // Types
 interface Player {
@@ -59,6 +62,8 @@ const StackTilesGame: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
 
+  const { writeContract } = useWriteContract();
+
   // Mock Web3 connection
   const connectWallet = useCallback(async () => {
     setIsLoading(true);
@@ -83,7 +88,11 @@ const StackTilesGame: React.FC = () => {
     
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: StackTiles.abi,
+        functionName: "joinGame",
+      })
       
       // Generate 5 random tiles
       const initialTiles = Array.from({ length: 5 }, () => 
