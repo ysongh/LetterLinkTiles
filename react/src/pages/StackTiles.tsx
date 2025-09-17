@@ -71,6 +71,24 @@ const StackTilesGame: React.FC = () => {
     args: [address]
   }) as { data: any };
 
+  const { data: targetLetter1 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: StackTiles.abi,
+    functionName: 'targetLetter1',
+  }) as { data: BigInt };
+
+  const { data: targetLetter2 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: StackTiles.abi,
+    functionName: 'targetLetter2',
+  }) as { data: BigInt };
+
+  const { data: targetLetter3 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: StackTiles.abi,
+    functionName: 'targetLetter3',
+  }) as { data: BigInt };
+
   const { writeContract } = useWriteContract();
 
   // Mock Web3 connection
@@ -314,10 +332,10 @@ const StackTilesGame: React.FC = () => {
               </div>
               
               <div className="space-y-4">
-                {[gameState.targetLetter1, gameState.targetLetter2, gameState.targetLetter3].map((target, index) => (
+                {[targetLetter1, targetLetter2, targetLetter3].map((target, index) => (
                   <div key={index} className="text-center">
                     <div className="bg-gradient-to-br from-red-500 to-pink-600 w-24 h-24 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-red-500/30 border-2 border-white/30">
-                      <span className="text-4xl font-bold text-white">{numberToLetter(target)}</span>
+                      <span className="text-4xl font-bold text-white">{numberToLetter(Number(target))}</span>
                     </div>
                     <p className="text-gray-300 mt-2">Target {index + 1}</p>
                   </div>
