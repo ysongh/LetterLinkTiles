@@ -49,7 +49,7 @@ const StackTilesGame: React.FC = () => {
     args: [address]
   }) as { data: any, refetch: () => void  };
 
-  const { data: players, refetch: playerRefetch } = useReadContract({
+  const { data: players = [], refetch: playerRefetch } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'players',
@@ -194,7 +194,7 @@ const StackTilesGame: React.FC = () => {
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
                 <h2 className="text-xl font-semibold text-white mb-4">Actions</h2>
                 <div className="space-y-3">
-                  {!playerTiles ? (
+                  {!playerTiles.length ? (
                     <button
                       onClick={joinGame}
                       disabled={isLoading}

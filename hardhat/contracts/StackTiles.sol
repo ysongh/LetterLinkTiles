@@ -59,9 +59,9 @@ contract StackTiles {
 
   constructor() {
     owner = msg.sender;
-    targetLetter1 = getRandomTile();
-    targetLetter2 = getRandomTile();
-    targetLetter3 = getRandomTile();
+    targetLetter1 = 1;
+    targetLetter2 = 2;
+    targetLetter3 = 3;
   }
 
   // Join the game and receive 5 random tiles
