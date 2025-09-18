@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Coins, Target, Trophy, User, Zap, Plus, Send } from 'lucide-react';
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
 import StackTiles from "../artifacts/contracts/StackTiles.sol/StackTiles.json";
@@ -45,6 +45,7 @@ const getTileRarity = (tileNum: number): string => {
 
 const StackTilesGame: React.FC = () => {
   const { address } = useAccount();
+  const { data: blockNumber } = useBlockNumber({ watch: true })
 
   const [gameState, setGameState] = useState<GameState>({
     targetLetter1: 1,
@@ -65,30 +66,37 @@ const StackTilesGame: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
 
-  const { data: playerTiles = [] } = useReadContract({
+  useEffect(() => {
+    playerTilesRefetch();
+    targetLetterRefetch1();
+    targetLetterRefetch2();
+    targetLetterRefetch3();
+  }, [blockNumber])
+
+  const { data: playerTiles = [], refetch: playerTilesRefetch } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'getPlayerTiles',
     args: [address]
-  }) as { data: any };
+  }) as { data: any, refetch: () => void  };
 
-  const { data: targetLetter1 } = useReadContract({
+  const { data: targetLetter1, refetch: targetLetterRefetch1 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'targetLetter1',
-  }) as { data: BigInt };
+  }) as { data: BigInt, refetch: () => void  };
 
-  const { data: targetLetter2 } = useReadContract({
+  const { data: targetLetter2, refetch: targetLetterRefetch2 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'targetLetter2',
-  }) as { data: BigInt };
+  }) as { data: BigInt, refetch: () => void  };
 
-  const { data: targetLetter3 } = useReadContract({
+  const { data: targetLetter3, refetch: targetLetterRefetch3 } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'targetLetter3',
-  }) as { data: BigInt };
+  }) as { data: BigInt, refetch: () => void  };
 
   const { writeContract } = useWriteContract();
 
@@ -272,7 +280,7 @@ const StackTilesGame: React.FC = () => {
                       
                       {selectedTile !== null && (
                         <button
-                          onClick={() => submitTile(selectedTile)}
+                          onClick={() => submitTile()}
                           disabled={isLoading}
                           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
                         >
