@@ -36,6 +36,7 @@ const StackTilesGame: React.FC = () => {
 
   useEffect(() => {
     playerTilesRefetch();
+    playerRefetch();
     targetLetterRefetch1();
     targetLetterRefetch2();
     targetLetterRefetch3();
@@ -45,6 +46,13 @@ const StackTilesGame: React.FC = () => {
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'getPlayerTiles',
+    args: [address]
+  }) as { data: any, refetch: () => void  };
+
+  const { data: players, refetch: playerRefetch } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: StackTiles.abi,
+    functionName: 'players',
     args: [address]
   }) as { data: any, refetch: () => void  };
 
@@ -126,6 +134,8 @@ const StackTilesGame: React.FC = () => {
     }
   }, [message]);
 
+  console.log(players);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4">
       <div className="max-w-6xl mx-auto">
@@ -171,11 +181,11 @@ const StackTilesGame: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span>Score:</span>
-                    <span className="font-bold text-yellow-400">0</span>
+                    <span className="font-bold text-yellow-400">{Number(players[1] || 0)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tiles Used:</span>
-                    <span>0</span>
+                    <span>{Number(players[2] || 0)}</span>
                   </div>
                 </div>
               </div>
