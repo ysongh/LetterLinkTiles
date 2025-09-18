@@ -1,27 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Coins, Target, Trophy, User, Zap, Plus, Send } from 'lucide-react';
-import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useBlockNumber, useConnect, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
 import StackTiles from "../artifacts/contracts/StackTiles.sol/StackTiles.json";
-
-// Types
-interface Player {
-  isActive: boolean;
-  tiles: number[];
-  score: number;
-  tilesUsed: number;
-}
-
-interface GameState {
-  targetLetter1: number;
-  targetLetter2: number;
-  targetLetter3: number;
-  playerData: Player;
-  isConnected: boolean;
-  address: string;
-  tileCost: number;
-}
 
 // Convert number to letter (1=A, 2=B, etc.)
 const numberToLetter = (num: number): string => {
@@ -45,22 +27,8 @@ const getTileRarity = (tileNum: number): string => {
 
 const StackTilesGame: React.FC = () => {
   const { address } = useAccount();
-  const { data: blockNumber } = useBlockNumber({ watch: true })
-
-  const [gameState, setGameState] = useState<GameState>({
-    targetLetter1: 1,
-    targetLetter2: 5,
-    targetLetter3: 9,
-    playerData: {
-      isActive: false,
-      tiles: [],
-      score: 0,
-      tilesUsed: 0
-    },
-    isConnected: false,
-    address: '',
-    tileCost: 0.001
-  });
+  const { connect, connectors } = useConnect();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
 
   const [selectedTile, setSelectedTile] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,28 +68,7 @@ const StackTilesGame: React.FC = () => {
 
   const { writeContract } = useWriteContract();
 
-  // Mock Web3 connection
-  const connectWallet = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // Simulate wallet connection
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setGameState(prev => ({
-        ...prev,
-        isConnected: true,
-        address: '0x' + Math.random().toString(16).substr(2, 40)
-      }));
-      setMessage('Wallet connected successfully!');
-    } catch (error) {
-      setMessage('Failed to connect wallet');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const joinGame = useCallback(async () => {
-    if (!gameState.isConnected) return;
-    
+  const joinGame = async () => {
     setIsLoading(true);
     try {
       writeContract({
@@ -129,28 +76,13 @@ const StackTilesGame: React.FC = () => {
         abi: StackTiles.abi,
         functionName: "joinGame",
       })
-      
-      // Generate 5 random tiles
-      const initialTiles = Array.from({ length: 5 }, () => 
-        Math.floor(Math.random() * 26) + 1
-      );
-      
-      setGameState(prev => ({
-        ...prev,
-        playerData: {
-          isActive: true,
-          tiles: initialTiles,
-          score: 0,
-          tilesUsed: 0
-        }
-      }));
       setMessage('Joined game! You received 5 tiles.');
     } catch (error) {
       setMessage('Failed to join game');
     } finally {
       setIsLoading(false);
     }
-  }, [gameState.isConnected]);
+  }
 
   const buyTile = async () => {
     setIsLoading(true);
@@ -213,11 +145,10 @@ const StackTilesGame: React.FC = () => {
         )}
 
         {/* Wallet Connection */}
-        {!gameState.isConnected ? (
+        {!address ? (
           <div className="text-center mb-8">
             <button
-              onClick={connectWallet}
-              disabled={isLoading}
+              onClick={() => connect({ connector: connectors[0] })}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50"
             >
               {isLoading ? 'Connecting...' : 'Connect Wallet'}
@@ -236,21 +167,15 @@ const StackTilesGame: React.FC = () => {
                 <div className="space-y-3 text-gray-300">
                   <div className="flex justify-between">
                     <span>Address:</span>
-                    <span className="font-mono text-sm">{gameState.address.slice(0, 8)}...</span>
+                    <span className="font-mono text-sm">{address.slice(0, 8)}...</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Score:</span>
-                    <span className="font-bold text-yellow-400">{gameState.playerData.score}</span>
+                    <span className="font-bold text-yellow-400">0</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tiles Used:</span>
-                    <span>{gameState.playerData.tilesUsed}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Active:</span>
-                    <span className={gameState.playerData.isActive ? 'text-green-400' : 'text-red-400'}>
-                      {gameState.playerData.isActive ? 'Yes' : 'No'}
-                    </span>
+                    <span>0</span>
                   </div>
                 </div>
               </div>
@@ -259,7 +184,7 @@ const StackTilesGame: React.FC = () => {
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
                 <h2 className="text-xl font-semibold text-white mb-4">Actions</h2>
                 <div className="space-y-3">
-                  {!gameState.playerData.isActive ? (
+                  {!playerTiles ? (
                     <button
                       onClick={joinGame}
                       disabled={isLoading}
@@ -275,7 +200,7 @@ const StackTilesGame: React.FC = () => {
                         className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
                       >
                         <Plus className="w-4 h-4" />
-                        <span>{isLoading ? 'Buying...' : `Buy Tile (${gameState.tileCost} ETH)`}</span>
+                        <span>{isLoading ? 'Buying...' : `Buy Tile 0.001 FLOW)`}</span>
                       </button>
                       
                       {selectedTile !== null && (
