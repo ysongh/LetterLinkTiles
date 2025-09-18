@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Coins, Target, Trophy, User, Zap, Plus, Send } from 'lucide-react';
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { parseEther } from "viem";
 
 import StackTiles from "../artifacts/contracts/StackTiles.sol/StackTiles.json";
 
@@ -143,28 +144,22 @@ const StackTilesGame: React.FC = () => {
     }
   }, [gameState.isConnected]);
 
-  const buyTile = useCallback(async () => {
-    if (!gameState.playerData.isActive) return;
-    
+  const buyTile = async () => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newTile = Math.floor(Math.random() * 26) + 1;
-      setGameState(prev => ({
-        ...prev,
-        playerData: {
-          ...prev.playerData,
-          tiles: [...prev.playerData.tiles, newTile]
-        }
-      }));
-      setMessage(`Purchased tile ${numberToLetter(newTile)}!`);
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: StackTiles.abi,
+        functionName: "buyTile",
+        value: parseEther("0.001")
+      })
+      setMessage(`Purchased tile`);
     } catch (error) {
       setMessage('Failed to buy tile');
     } finally {
       setIsLoading(false);
     }
-  }, [gameState.playerData.isActive]);
+  };
 
   const submitTile = async () => {
     setIsLoading(true);
