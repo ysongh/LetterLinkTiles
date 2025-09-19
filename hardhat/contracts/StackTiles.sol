@@ -5,6 +5,7 @@ contract StackTiles {
   event PlayerJoined(address indexed player, uint8[] initialTiles);
   event WordSubmitted(address indexed player, uint8 tile);
   event TilePurchased(address indexed player, uint8 tile);
+  event TileDiscard(address indexed player, uint8 tile);
 
   // Tile distribution (A=1, B=2, ..., Z=26)
   // Based on standard Scrabble distribution
@@ -97,6 +98,13 @@ contract StackTiles {
     }
     
     emit TilePurchased(msg.sender, newTile);
+  }
+
+  function discardTile(uint8 tileID) external payable {
+    require(tileID > players[msg.sender].tiles.length, "ID out of range");
+
+    removeTilesFromPlayer(msg.sender, tileID);
+    emit TileDiscard(msg.sender, tileID);
   }
 
   function submitTile(uint8 tileUsed) external {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Coins, Target, Trophy, User, Zap, Plus, Send } from 'lucide-react';
+import { Coins, Target, Trophy, Trash, User, Zap, Plus, Send } from 'lucide-react';
 import { useAccount, useBlockNumber, useConnect, useReadContract, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
@@ -104,6 +104,23 @@ const StackTilesGame: React.FC = () => {
       setMessage(`Purchased tile`);
     } catch (error) {
       setMessage('Failed to buy tile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const discardTile = async () => {
+    setIsLoading(true);
+    try {
+      writeContract({
+        address: import.meta.env.VITE_GAME_CONTRACT,
+        abi: StackTiles.abi,
+        functionName: "discardTile",
+         args: [selectedTile]
+      })
+      setMessage(`Discard tile`);
+    } catch (error) {
+      setMessage('Failed to discard tile');
     } finally {
       setIsLoading(false);
     }
@@ -214,14 +231,24 @@ const StackTilesGame: React.FC = () => {
                       </button>
                       
                       {selectedTile !== null && (
-                        <button
-                          onClick={() => submitTile()}
-                          disabled={isLoading}
-                          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
-                        >
-                          <Send className="w-4 h-4" />
-                          <span>{isLoading ? 'Submitting...' : `Submit ${numberToLetter(selectedTile)}`}</span>
-                        </button>
+                        <>
+                          <button
+                            onClick={() => submitTile()}
+                            disabled={isLoading}
+                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
+                          >
+                            <Send className="w-4 h-4" />
+                            <span>{isLoading ? 'Submitting...' : `Submit ${numberToLetter(selectedTile)}`}</span>
+                          </button>
+                          <button
+                            onClick={() => discardTile()}
+                            disabled={isLoading}
+                            className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
+                          >
+                            <Trash className="w-4 h-4" />
+                            <span>{isLoading ? 'Submitting...' : `Discard ${numberToLetter(selectedTile)}`}</span>
+                          </button>
+                        </>
                       )}
                     </>
                   )}
