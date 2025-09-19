@@ -88,6 +88,7 @@ contract StackTiles {
 
   function buyTile() external payable {
     require(msg.value >= tileCost, "Insufficient payment for tile");
+    require(players[msg.sender].tiles.length > 12, "Cannot have more than 12 tiles");
     
     uint8 newTile = getRandomTile();
     players[msg.sender].tiles.push(newTile);
