@@ -51,6 +51,8 @@ contract StackTiles {
   uint8 public targetLetter2;
   uint8 public targetLetter3;
   uint256 public tileCost = 0.001 ether;
+  address currentStreakPlayer;
+  uint256 currentStreakCount;
 
   modifier onlyOwner() {
     require(msg.sender == owner, "Only owner can call this function");
@@ -99,16 +101,16 @@ contract StackTiles {
 
   function submitTile(uint8 tileUsed) external {
     if (tileUsed == targetLetter1) {
-      players[msg.sender].score += 1;
+      players[msg.sender].score += calculatScore(msg.sender);
       targetLetter1 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
     } else if (tileUsed == targetLetter2) {
-      uint256 wordScore = 1;
+      uint256 wordScore = calculatScore(msg.sender);
       players[msg.sender].score += wordScore;
       targetLetter2 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
     } else if (tileUsed == targetLetter3) {
-      uint256 wordScore = 1;
+      uint256 wordScore = calculatScore(msg.sender);
       players[msg.sender].score += wordScore;
       targetLetter3 = getRandomTile();
       removeTilesFromPlayer(msg.sender, tileUsed);
@@ -132,6 +134,18 @@ contract StackTiles {
 
   function getPlayerTiles(address player) external view returns (uint8[] memory) {
     return players[player].tiles;
+  }
+
+  function calculatScore(address player) internal returns (uint256) {
+    if (player == currentStreakPlayer) {
+      currentStreakCount++;
+      return currentStreakCount;
+    }
+    else {
+      currentStreakPlayer = player;
+      currentStreakCount = 0;
+      return 1;
+    }
   }
 
   // Internal function to get a random tile
