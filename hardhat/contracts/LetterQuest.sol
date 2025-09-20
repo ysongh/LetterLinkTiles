@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 contract LetterQuest {
   event PlayerJoined(address indexed player);
   event TileMinted(address indexed player, uint8 tile);
+  event RollResult(address player, uint8 num);
 
   // Tile scores (A=1, B=3, C=3, D=2, E=1, F=4, G=2, H=4, I=1, J=8, K=5, L=1, M=3, N=1, O=1, P=3, Q=10, R=1, S=1, T=1, U=1, V=4, W=4, X=8, Y=4, Z=10)
   uint8[27] private tileScores = [0, 1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10];
@@ -13,6 +14,7 @@ contract LetterQuest {
     uint8[] tiles;
     uint256 score;
     uint256 tilesUsed;
+    uint8 posititon;
   }
 
   mapping(address => Player) public players;
@@ -38,9 +40,21 @@ contract LetterQuest {
     players[msg.sender].isActive = true;
     players[msg.sender].score = 0;
     players[msg.sender].tilesUsed = 0;
+    players[msg.sender].posititon = 0;
     
     activePlayers.push(msg.sender);
     emit PlayerJoined(msg.sender);
+  }
+
+  function rollDice() public {
+    uint8 randomNumber = uint8(getRandomNumber());
+    players[msg.sender].posititon += randomNumber + 1;
+
+    if (players[msg.sender].posititon > 25) {
+        players[msg.sender].posititon =  players[msg.sender].posititon - 26;
+    }
+
+    emit RollResult(msg.sender, randomNumber);
   }
 
   function addTargetWords(string memory _targetWord1, string memory _targetWord2, string memory _targetWord3) external onlyOwner{
@@ -50,7 +64,9 @@ contract LetterQuest {
   }
 
   function mintTile() external payable {
-    uint8 newTile = 1;
+    require(players[msg.sender].tiles.length > 10, "Cannot have more than 10 tiles");
+
+    uint8 newTile = players[msg.sender].posititon;
     players[msg.sender].tiles.push(newTile);
     
     emit TileMinted(msg.sender, newTile);
@@ -73,6 +89,16 @@ contract LetterQuest {
 
   function getPlayerTiles(address player) external view returns (uint8[] memory) {
     return players[player].tiles;
+  }
+
+  function getRandomNumber() internal view returns (uint256) {
+    uint256 randomIndex = uint256(keccak256(abi.encodePacked(
+      block.timestamp,
+      msg.sender,
+      players[msg.sender].tiles.length
+    ))) % 6;
+    
+    return randomIndex;
   }
 
   function _compareTilesToWord(uint8[] calldata tilesUsed, string memory targetWord) private pure returns (bool) {
