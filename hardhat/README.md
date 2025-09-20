@@ -11,6 +11,7 @@
 npx hardhat ignition deploy ./ignition/modules/OnChainScrabble.js --network localhost
 npx hardhat ignition deploy ./ignition/modules/TargetWords.js --network localhost
 npx hardhat ignition deploy ./ignition/modules/StackTiles.js --network localhost
+npx hardhat ignition deploy ./ignition/modules/LetterQuest.js --network localhost
 
 ## Deploy to Flow EVM Testnet
 npx hardhat ignition deploy ./ignition/modules/OnChainScrabble.js --network flowEVMTestnet

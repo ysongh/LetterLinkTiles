@@ -1,0 +1,104 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+contract LetterQuest {
+  event PlayerJoined(address indexed player);
+  event TileMinted(address indexed player, uint8 tile);
+
+  // Tile scores (A=1, B=3, C=3, D=2, E=1, F=4, G=2, H=4, I=1, J=8, K=5, L=1, M=3, N=1, O=1, P=3, Q=10, R=1, S=1, T=1, U=1, V=4, W=4, X=8, Y=4, Z=10)
+  uint8[27] private tileScores = [0, 1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10];
+
+  struct Player {
+    bool isActive;
+    uint8[] tiles;
+    uint256 score;
+    uint256 tilesUsed;
+  }
+
+  mapping(address => Player) public players;
+  address[] public activePlayers;
+  address public owner;
+  string public targetWord1;
+  string public targetWord2;
+  string public targetWord3;
+  uint256 public tileCost = 0.001 ether;
+
+  modifier onlyOwner() {
+    require(msg.sender == owner, "Only owner can call this function");
+    _;
+  }
+
+  constructor() {
+    owner = msg.sender;
+  }
+
+  function joinGame() external {
+    require(!players[msg.sender].isActive, "Player already active");
+    
+    players[msg.sender].isActive = true;
+    players[msg.sender].score = 0;
+    players[msg.sender].tilesUsed = 0;
+    
+    activePlayers.push(msg.sender);
+    emit PlayerJoined(msg.sender);
+  }
+
+  function addTargetWords(string memory _targetWord1, string memory _targetWord2, string memory _targetWord3) external onlyOwner{
+    targetWord1 = _targetWord1;
+    targetWord2 = _targetWord2;
+    targetWord3 = _targetWord3;
+  }
+
+  function mintTile() external payable {
+    uint8 newTile = 1;
+    players[msg.sender].tiles.push(newTile);
+    
+    emit TileMinted(msg.sender, newTile);
+  }
+
+  // Remove tiles from player's inventory
+  function removeTilesFromPlayer(address player, uint8[] memory tilesUsed) internal {
+    for (uint i = 0; i < tilesUsed.length; i++) {
+      for (uint j = 0; j < players[player].tiles.length; j++) {
+        if (players[player].tiles[j] == tilesUsed[i]) {
+          // Remove tile by swapping with last element and popping
+          players[player].tiles[j] = players[player].tiles[players[player].tiles.length - 1];
+          players[player].tiles.pop();
+          break;
+        }
+      }
+    }
+    players[player].tilesUsed += tilesUsed.length;
+  }
+
+  function getPlayerTiles(address player) external view returns (uint8[] memory) {
+    return players[player].tiles;
+  }
+
+  function _compareTilesToWord(uint8[] calldata tilesUsed, string memory targetWord) private pure returns (bool) {
+    bytes memory wordBytes = bytes(targetWord);
+    
+    // Check if lengths match
+    if (tilesUsed.length != wordBytes.length) {
+      return false;
+    }
+    
+    // Compare each tile (assuming tiles are ASCII character codes)
+    for (uint i = 0; i < tilesUsed.length; i++) {
+      if (tilesUsed[i] != uint8(wordBytes[i])) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  // Calculate word score based on tile values
+  function calculateWordScore(uint8[] memory tilesUsed) internal view returns (uint256) {
+    uint256 score = 0;
+    for (uint i = 0; i < tilesUsed.length; i++) {
+      score += tileScores[tilesUsed[i]];
+    }
+    return score;
+  }
+}
