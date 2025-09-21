@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 contract LetterQuest {
   event PlayerJoined(address indexed player);
   event TileMinted(address indexed player, uint8 tile);
+  event TileDiscard(address indexed player, uint8[] tile);
   event RollResult(address player, uint8 num);
 
   // Tile scores (A=1, B=3, C=3, D=2, E=1, F=4, G=2, H=4, I=1, J=8, K=5, L=1, M=3, N=1, O=1, P=3, Q=10, R=1, S=1, T=1, U=1, V=4, W=4, X=8, Y=4, Z=10)
@@ -70,6 +71,11 @@ contract LetterQuest {
     players[msg.sender].tiles.push(newTile);
     
     emit TileMinted(msg.sender, newTile);
+  }
+
+  function discardTile(uint8[] memory tileIDs) external payable {
+    removeTilesFromPlayer(msg.sender, tileIDs);
+    emit TileDiscard(msg.sender, tileIDs);
   }
 
   // Remove tiles from player's inventory
