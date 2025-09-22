@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Coins, Trophy, Users, Target, Trash2, Plus, Send } from 'lucide-react';
+import { useWriteContract } from "wagmi";
+
+import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
 
 interface Player {
   isActive: boolean;
@@ -16,7 +19,7 @@ interface GameEvent {
   timestamp: number;
 }
 
-const LetterQuest: React.FC = () => {
+const LetterQuestGame: React.FC = () => {
   // Game state
   const [isConnected, setIsConnected] = useState(false);
   const [playerAddress, setPlayerAddress] = useState('');
@@ -32,6 +35,8 @@ const LetterQuest: React.FC = () => {
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
   const [gameEvents, setGameEvents] = useState<GameEvent[]>([]);
   const [lastRoll, setLastRoll] = useState<number | null>(null);
+
+  const { writeContract } = useWriteContract();
 
   // Convert position number to letter (A=1, B=2, etc.)
   const positionToLetter = (pos: number): string => {
@@ -68,6 +73,11 @@ const LetterQuest: React.FC = () => {
   const joinGame = async () => {
     setPlayer(prev => ({ ...prev, isActive: true }));
     addGameEvent('join', 'You joined the game!');
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: LetterQuest.abi,
+      functionName: "joinGame",
+    })
   };
 
   const rollDice = async () => {
@@ -402,4 +412,4 @@ const LetterQuest: React.FC = () => {
   );
 };
 
-export default LetterQuest;
+export default LetterQuestGame;
