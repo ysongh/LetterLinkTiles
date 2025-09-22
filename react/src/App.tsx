@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import Game from "./pages/Game";
 import TargetWords from "./pages/TargetWords";
 import StackTilesGame from "./pages/StackTiles";
+import LetterQuest from "./pages/LetterQuest";
 
 function App() {
   useEffect(() => {
@@ -18,6 +19,9 @@ function App() {
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white">
         <ConnectMenu />
         <Routes>
+          <Route
+            path="/letterquest"
+            element={<LetterQuest />} />
           <Route
             path="/stacktiles"
             element={<StackTilesGame />} />

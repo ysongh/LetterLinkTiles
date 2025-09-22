@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Target, Boxes } from 'lucide-react';
+import { Target, Boxes, Puzzle } from 'lucide-react';
 
 function Landing() {
   const navigate = useNavigate();
@@ -29,6 +29,17 @@ function Landing() {
             <p className="text-sm text-gray-400">Submit tiles to the targets letters and earn points</p>
             <button
               onClick={() => navigate("/stacktiles")}
+              className="w-full mt-3 gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-10 py-2 rounded-lg font-semibold transition-all disabled:opacity-50"
+            >
+              Play
+            </button>
+          </div>
+          <div className="bg-white/5 p-4 rounded-lg">
+            <Puzzle className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+            <h3 className="font-semibold">Letter Quest</h3>
+            <p className="text-sm text-gray-400">Roll Dice and mint tiles</p>
+            <button
+              onClick={() => navigate("/letterquest")}
               className="w-full mt-3 gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-10 py-2 rounded-lg font-semibold transition-all disabled:opacity-50"
             >
               Play
