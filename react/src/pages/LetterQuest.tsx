@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Coins, Trophy, Users, Target, Trash2, Plus, Send } from 'lucide-react';
-import { useWriteContract } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "wagmi";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
 
@@ -20,6 +20,9 @@ interface GameEvent {
 }
 
 const LetterQuestGame: React.FC = () => {
+  const { address } = useAccount();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
+
   // Game state
   const [isConnected, setIsConnected] = useState(false);
   const [playerAddress, setPlayerAddress] = useState('');
@@ -35,6 +38,17 @@ const LetterQuestGame: React.FC = () => {
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
   const [gameEvents, setGameEvents] = useState<GameEvent[]>([]);
   const [lastRoll, setLastRoll] = useState<number | null>(null);
+
+  useEffect(() => {
+    playerTilesRefetch();
+  }, [blockNumber])
+
+  const { data: playerTiles = [], refetch: playerTilesRefetch } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'getPlayerTiles',
+    args: [address]
+  }) as { data: any, refetch: () => void  };
 
   const { writeContract } = useWriteContract();
 
@@ -323,11 +337,11 @@ const LetterQuestGame: React.FC = () => {
               </div>
 
               {/* Player Tiles */}
-              {player.isActive && (
+              {playerTiles && (
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-4">Your Tiles</h3>
                   <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
-                    {player.tiles.map((tile, index) => (
+                    {playerTiles.map((tile, index) => (
                       <button
                         key={index}
                         onClick={() => toggleTileSelection(index)}
