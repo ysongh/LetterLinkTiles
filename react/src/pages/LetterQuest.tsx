@@ -81,13 +81,11 @@ const LetterQuestGame: React.FC = () => {
   };
 
   const rollDice = async () => {
-    const roll = Math.floor(Math.random() * 6) + 1;
-    setLastRoll(roll);
-    
-    const newPosition = (player.position + roll) % 26;
-    setPlayer(prev => ({ ...prev, position: newPosition }));
-    
-    addGameEvent('roll', `Rolled ${roll}! Moved to ${positionToLetter(newPosition)}`);
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: LetterQuest.abi,
+      functionName: "rollDice",
+    });
   };
 
   const mintTile = async () => {
