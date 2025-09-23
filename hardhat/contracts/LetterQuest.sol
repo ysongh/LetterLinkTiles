@@ -84,8 +84,8 @@ contract LetterQuest {
     targetWord3 = _targetWord3;
   }
 
-  function mintTile() external payable {
-    require(players[msg.sender].tiles.length > 10, "Cannot have more than 10 tiles");
+  function mintTile() external {
+    require(players[msg.sender].tiles.length < 10, "Cannot have more than 10 tiles");
 
     uint8 newTile = players[msg.sender].posititon;
     players[msg.sender].tiles.push(newTile);
@@ -93,7 +93,7 @@ contract LetterQuest {
     emit TileMinted(msg.sender, newTile);
   }
 
-  function discardTile(uint8[] memory tileIDs) external payable {
+  function discardTile(uint8[] memory tileIDs) external {
     removeTilesFromPlayer(msg.sender, tileIDs);
     emit TileDiscard(msg.sender, tileIDs);
   }

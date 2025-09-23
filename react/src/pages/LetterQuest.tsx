@@ -103,18 +103,13 @@ const LetterQuestGame: React.FC = () => {
   };
 
   const mintTile = async () => {
-    if (player.tiles.length >= 10) {
-      alert('Cannot have more than 10 tiles!');
-      return;
-    }
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: LetterQuest.abi,
+      functionName: "mintTile",
+    });
     
-    const newTile = player.position || Math.floor(Math.random() * 26) + 1;
-    setPlayer(prev => ({ 
-      ...prev, 
-      tiles: [...prev.tiles, newTile] 
-    }));
-    
-    addGameEvent('mint', `Minted tile: ${tileToLetter(newTile)}`);
+    addGameEvent('mint', `Minted tile`);
   };
 
   const discardTiles = async () => {
