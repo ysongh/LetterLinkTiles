@@ -41,6 +41,7 @@ const LetterQuestGame: React.FC = () => {
 
   useEffect(() => {
     playerTilesRefetch();
+    playerRefetch();
     targetWordRefetch1();
     targetWordRefetch2();
     targetWordRefetch3();
@@ -50,6 +51,13 @@ const LetterQuestGame: React.FC = () => {
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'getPlayerTiles',
+    args: [address]
+  }) as { data: any, refetch: () => void  };
+
+  const { data: players, refetch: playerRefetch } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'players',
     args: [address]
   }) as { data: any, refetch: () => void  };
 
@@ -189,6 +197,8 @@ const LetterQuestGame: React.FC = () => {
     );
   };
 
+  console.log(players)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
       <div className="container mx-auto px-4 py-8">
@@ -240,7 +250,7 @@ const LetterQuestGame: React.FC = () => {
                     const radius = 140; // Distance from center
                     const x = Math.cos(radian) * radius + 160; // Center offset
                     const y = Math.sin(radian) * radius + 160; // Center offset
-                    const isPlayerPosition = player.position === i + 1;
+                    const isPlayerPosition = players[3] === i + 1;
                     const isStart = i === 25; // Position 0 maps to index 25
                     
                     return (
@@ -267,7 +277,7 @@ const LetterQuestGame: React.FC = () => {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center bg-black/30 rounded-full p-6 border border-white/20">
                       <div className="text-lg font-bold text-yellow-400">Score</div>
-                      <div className="text-2xl font-bold">{player.score}</div>
+                      <div className="text-2xl font-bold">{Number(players[1] || 0)}</div>
                       <div className="text-xs text-gray-300 mt-1">
                         {player.isActive ? positionToLetter(player.position) : 'Inactive'}
                       </div>
@@ -285,15 +295,15 @@ const LetterQuestGame: React.FC = () => {
                 {/* Player Stats Row */}
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <div className="text-xl font-bold text-blue-400">{player.tiles.length}</div>
+                    <div className="text-xl font-bold text-blue-400">{playerTiles.length}</div>
                     <div className="text-sm text-gray-300">Tiles</div>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-green-400">{player.tilesUsed}</div>
+                    <div className="text-xl font-bold text-green-400">{Number(players[2] || 0)}</div>
                     <div className="text-sm text-gray-300">Used</div>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-purple-400">{player.tiles.length}/10</div>
+                    <div className="text-xl font-bold text-purple-400">{playerTiles.length}/10</div>
                     <div className="text-sm text-gray-300">Capacity</div>
                   </div>
                 </div>
