@@ -136,12 +136,14 @@ const LetterQuestGame: React.FC = () => {
   const discardTiles = async () => {
     if (selectedTiles.length === 0) return;
     
-    setPlayer(prev => ({
-      ...prev,
-      tiles: prev.tiles.filter((_, index) => !selectedTiles.includes(index))
-    }));
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: LetterQuest.abi,
+      functionName: "discardTile",
+      args: [selectedTiles]
+    })
     
-    addGameEvent('discard', `Discarded ${selectedTiles.length} tiles`);
+    addGameEvent('discard', `Discarded tiles`);
     setSelectedTiles([]);
   };
 
