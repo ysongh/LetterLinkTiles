@@ -41,6 +41,9 @@ const LetterQuestGame: React.FC = () => {
 
   useEffect(() => {
     playerTilesRefetch();
+    targetWordRefetch1();
+    targetWordRefetch2();
+    targetWordRefetch3();
   }, [blockNumber])
 
   const { data: playerTiles = [], refetch: playerTilesRefetch } = useReadContract({
@@ -49,6 +52,24 @@ const LetterQuestGame: React.FC = () => {
     functionName: 'getPlayerTiles',
     args: [address]
   }) as { data: any, refetch: () => void  };
+
+  const { data: targetWord1, refetch: targetWordRefetch1 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'targetWord1',
+  }) as { data: any, refetch: () => void  };
+
+  const { data: targetWord2, refetch: targetWordRefetch2 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'targetWord2',
+  }) as { data: any, refetch: () => void };
+
+  const { data: targetWord3, refetch: targetWordRefetch3 } = useReadContract({
+    address: import.meta.env.VITE_GAME_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'targetWord3',
+  }) as { data: any,refetch: () => void  };
 
   const { writeContract } = useWriteContract();
 
@@ -374,11 +395,15 @@ const LetterQuestGame: React.FC = () => {
                   <h3 className="text-lg font-bold">Target Words</h3>
                 </div>
                 <div className="space-y-2">
-                  {targetWords.map((word, index) => (
-                    <div key={index} className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
-                      {word}
-                    </div>
-                  ))}
+                  <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
+                    {targetWord1}
+                  </div>
+                  <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
+                    {targetWord2}
+                  </div>
+                  <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
+                    {targetWord3}
+                  </div>
                 </div>
               </div>
 
