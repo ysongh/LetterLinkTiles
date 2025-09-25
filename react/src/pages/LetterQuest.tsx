@@ -158,26 +158,16 @@ const LetterQuestGame: React.FC = () => {
   const submitWord = async () => {
     if (selectedTiles.length === 0) return;
     
-    const selectedTileValues = selectedTiles.map(index => player.tiles[index]);
-    const word = selectedTileValues.map(tile => tileToLetter(tile)).join('');
+    const selectedTileValues = selectedTiles.map(index => playerTiles[index]);
     
-    // Check if word matches any target word
-    const isValidWord = targetWords.some(target => target === word);
-    
-    if (isValidWord) {
-      const score = selectedTileValues.reduce((sum, tile) => sum + getTileScore(tile), 0);
-      setPlayer(prev => ({
-        ...prev,
-        score: prev.score + score,
-        tiles: prev.tiles.filter((_, index) => !selectedTiles.includes(index)),
-        tilesUsed: prev.tilesUsed + selectedTiles.length
-      }));
-      
-      addGameEvent('word', `Submitted word "${word}" for ${score} points!`);
-      setSelectedTiles([]);
-    } else {
-      alert(`"${word}" is not a valid target word!`);
-    }
+    writeContract({
+      address: import.meta.env.VITE_GAME_CONTRACT,
+      abi: LetterQuest.abi,
+      functionName: "submitWord",
+      args: [selectedTileValues]
+    });
+
+    setSelectedTiles([]);
   };
 
   const addGameEvent = (type: GameEvent['type'], data: string) => {
