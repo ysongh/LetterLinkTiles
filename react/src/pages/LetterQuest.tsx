@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Coins, Trophy, Users, Target, Trash2, Plus, Send } from 'lucide-react';
-import { useAccount, useBlockNumber, useReadContract, useWriteContract } from "wagmi";
+import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Target, Trash2, Plus, Send } from 'lucide-react';
+import { useAccount, useBlockNumber, useConnect, useReadContract, useWriteContract } from "wagmi";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
-
-interface Player {
-  isActive: boolean;
-  tiles: number[];
-  score: number;
-  tilesUsed: number;
-  position: number;
-}
 
 interface GameEvent {
   type: 'join' | 'roll' | 'word' | 'mint' | 'discard';
@@ -20,24 +12,12 @@ interface GameEvent {
 }
 
 const LetterQuestGame: React.FC = () => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
   const { data: blockNumber } = useBlockNumber({ watch: true });
-
-  // Game state
-  const [isConnected, setIsConnected] = useState(false);
-  const [playerAddress, setPlayerAddress] = useState('');
-  const [player, setPlayer] = useState<Player>({
-    isActive: false,
-    tiles: [],
-    score: 0,
-    tilesUsed: 0,
-    position: 0
-  });
   
-  const [targetWords, setTargetWords] = useState(['HELLO', 'WORLD', 'QUEST']);
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
   const [gameEvents, setGameEvents] = useState<GameEvent[]>([]);
-  const [lastRoll, setLastRoll] = useState<number | null>(null);
 
   useEffect(() => {
     playerTilesRefetch();
@@ -54,7 +34,7 @@ const LetterQuestGame: React.FC = () => {
     args: [address]
   }) as { data: any, refetch: () => void  };
 
-  const { data: players, refetch: playerRefetch } = useReadContract({
+  const { data: players = [], refetch: playerRefetch } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'players',
@@ -106,15 +86,7 @@ const LetterQuestGame: React.FC = () => {
     return <IconComponent className="w-8 h-8" />;
   };
 
-  // Mock functions (replace with actual contract calls)
-  const connectWallet = async () => {
-    // Mock connection
-    setIsConnected(true);
-    setPlayerAddress('0x1234...5678');
-  };
-
   const joinGame = async () => {
-    setPlayer(prev => ({ ...prev, isActive: true }));
     addGameEvent('join', 'You joined the game!');
     writeContract({
       address: import.meta.env.VITE_GAME_CONTRACT,
@@ -159,7 +131,7 @@ const LetterQuestGame: React.FC = () => {
     if (selectedTiles.length === 0) return;
     
     const selectedTileValues = selectedTiles.map(index => playerTiles[index]);
-    
+
     writeContract({
       address: import.meta.env.VITE_GAME_CONTRACT,
       abi: LetterQuest.abi,
@@ -187,7 +159,7 @@ const LetterQuestGame: React.FC = () => {
     );
   };
 
-  console.log(players)
+  console.log(players, DiceIcon);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
@@ -205,11 +177,11 @@ const LetterQuestGame: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
-              <span>{isConnected ? `Connected: ${playerAddress}` : 'Not Connected'}</span>
+              <span>{isConnected ? `Connected: ${address}` : 'Not Connected'}</span>
             </div>
             {!isConnected && (
               <button
-                onClick={connectWallet}
+                onClick={() => connect({ connector: connectors[0] })}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
               >
                 Connect Wallet
@@ -269,17 +241,10 @@ const LetterQuestGame: React.FC = () => {
                       <div className="text-lg font-bold text-yellow-400">Score</div>
                       <div className="text-2xl font-bold">{Number(players[1] || 0)}</div>
                       <div className="text-xs text-gray-300 mt-1">
-                        {player.isActive ? positionToLetter(player.position) : 'Inactive'}
+                        {players[0] ? positionToLetter(players[3]) : 'Inactive'}
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Last roll indicator */}
-                  {lastRoll && player.isActive && (
-                    <div className="absolute top-4 right-4 bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold border-2 border-blue-300 animate-bounce">
-                      {lastRoll}
-                    </div>
-                  )}
                 </div>
 
                 {/* Player Stats Row */}
@@ -303,7 +268,7 @@ const LetterQuestGame: React.FC = () => {
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
                 <h3 className="text-xl font-bold mb-4">Game Actions</h3>
                 <div className="flex flex-wrap gap-4">
-                  {!player.isActive && (
+                  {!players[0] && (
                     <button
                       onClick={joinGame}
                       className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors"
@@ -313,19 +278,20 @@ const LetterQuestGame: React.FC = () => {
                     </button>
                   )}
                   
-                  {player.isActive && (
+                  {players[0]&& (
                     <>
                       <button
                         onClick={rollDice}
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
                       >
-                        {lastRoll ? <DiceIcon number={lastRoll} /> : <Dice1 className="w-4 h-4" />}
+                        {/* {lastRoll ? <DiceIcon number={lastRoll} /> : <Dice1 className="w-4 h-4" />} */}
+                        <Dice1 className="w-4 h-4" />
                         Roll Dice
                       </button>
                       
                       <button
                         onClick={mintTile}
-                        disabled={player.tiles.length >= 10}
+                        disabled={playerTiles.length >= 10}
                         className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition-colors"
                       >
                         <Plus className="w-4 h-4" />
@@ -359,7 +325,7 @@ const LetterQuestGame: React.FC = () => {
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-4">Your Tiles</h3>
                   <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
-                    {playerTiles.map((tile, index) => (
+                    {playerTiles.map((tile: number, index: number) => (
                       <button
                         key={index}
                         onClick={() => toggleTileSelection(index)}
@@ -377,10 +343,10 @@ const LetterQuestGame: React.FC = () => {
                   {selectedTiles.length > 0 && (
                     <div className="mt-4 p-3 bg-yellow-400/20 rounded-lg">
                       <div className="font-bold">
-                        Selected Word: {selectedTiles.map(i => tileToLetter(player.tiles[i])).join('')}
+                        Selected Word: {selectedTiles.map(i => tileToLetter(playerTiles[i])).join('')}
                       </div>
                       <div className="text-sm text-gray-300">
-                        Score: {selectedTiles.reduce((sum, i) => sum + getTileScore(player.tiles[i]), 0)} points
+                        Score: {selectedTiles.reduce((sum, i) => sum + getTileScore(playerTiles[i]), 0)} points
                       </div>
                     </div>
                   )}

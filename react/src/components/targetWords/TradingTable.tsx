@@ -63,8 +63,6 @@ function TradingItem({ id, playerTiles } : { id: BigInt, playerTiles: BigInt[] }
 
   const {
     writeContract,
-    data: txHash,
-    isPending
   } = useWriteContract();
 
   const acceptTradeOffer = async () => {

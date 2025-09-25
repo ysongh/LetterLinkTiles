@@ -30,6 +30,7 @@ const wagmiAdapter = new WagmiAdapter({
 
 createAppKit({
   adapters: [wagmiAdapter],
+  // @ts-ignore
   networks,
   projectId,
   metadata,
@@ -40,6 +41,7 @@ createAppKit({
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
+    {/* @ts-ignore */}
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <App />

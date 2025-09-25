@@ -38,7 +38,7 @@ export default function Game() {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true })
   
-  const [gameState, setGameState] = useState<GameState>({
+  const [gameState] = useState<GameState>({
     isConnected: false,
     address: null,
     player: null,
@@ -68,10 +68,6 @@ export default function Game() {
     return alphabet[tileId - 1] || '?';
   };
 
-  const letterToTile = (letter: string): number => {
-    return letter.toUpperCase().charCodeAt(0) - 64;
-  };
-
   const { data: playerTiles = [], refetch: playerTilesRefetch  } = useReadContract({
     address: import.meta.env.VITE_GAME_CONTRACT,
     abi: OnChainScrabble.abi,
@@ -92,9 +88,7 @@ export default function Game() {
   }) as { data: any  };
 
   const {
-    writeContract,
-    data: txHash,
-    isPending
+    writeContract
   } = useWriteContract();
 
   const joinGame = async () => {
@@ -184,7 +178,7 @@ export default function Game() {
     return tiles.reduce((sum, tileId) => sum + (tileScores[tileId] || 0), 0);
   };
 
-  console.log(wordSubmissionCounter)
+  console.log(wordSubmissionCounter, notification)
 
   return (
     <div className="container mx-auto">
@@ -221,7 +215,7 @@ export default function Game() {
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-3">Your Tiles ({playerTiles.length})</h3>
               <div className="flex flex-wrap gap-2">
-                {playerTiles?.map((tile, index) => (
+                {playerTiles?.map((tile: number, index: number) => (
                   <button
                     key={index}
                     onClick={() => toggleTileSelection(index)}

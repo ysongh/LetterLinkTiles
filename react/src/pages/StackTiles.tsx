@@ -297,7 +297,7 @@ const StackTilesGame: React.FC = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-3">
-                  {playerTiles.map((tile, index) => (
+                  {playerTiles.map((tile: number, index: number) => (
                     <button
                       key={index}
                       onClick={() => setSelectedTile(tile)}

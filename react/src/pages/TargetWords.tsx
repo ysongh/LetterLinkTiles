@@ -64,9 +64,7 @@ const TargetWordsGame: React.FC = () => {
   }) as { data: string };
 
   const {
-    writeContract,
-    data: txHash,
-    isPending
+    writeContract
   } = useWriteContract();
 
   // Mock join game function
@@ -266,7 +264,7 @@ const TargetWordsGame: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         {selectedTiles.map((s, index) => (
-                          <span key={index} className="text-lg font-mono">{numberToLetter(playerTiles[Number(s)])}</span>
+                          <span key={index} className="text-lg font-mono">{numberToLetter(Number(playerTiles[Number(s)]))}</span>
                         ))}
                        
                         <span className="ml-3 text-sm text-gray-400">
