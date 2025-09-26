@@ -52,8 +52,8 @@ contract LetterQuest {
     uint8 randomNumber = uint8(getRandomNumber());
     players[msg.sender].posititon += randomNumber + 1;
 
-    if (players[msg.sender].posititon > 25) {
-        players[msg.sender].posititon =  players[msg.sender].posititon - 26;
+    if (players[msg.sender].posititon > 26) {
+      players[msg.sender].posititon =  players[msg.sender].posititon - 27;
     }
 
     emit RollResult(msg.sender, randomNumber);
@@ -86,8 +86,9 @@ contract LetterQuest {
 
   function mintTile() external {
     require(players[msg.sender].tiles.length < 10, "Cannot have more than 10 tiles");
+    require(players[msg.sender].posititon > 0, "Cannot mint this tile");
 
-    uint8 newTile = players[msg.sender].posititon;
+    uint8 newTile = players[msg.sender].posititon - 1;
     players[msg.sender].tiles.push(newTile);
     
     emit TileMinted(msg.sender, newTile);

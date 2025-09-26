@@ -69,7 +69,6 @@ const LetterQuestGame: React.FC = () => {
 
   // Convert tile number to letter for display
   const tileToLetter = (tile: number): string => {
-    if (tile === 0) return '?';
     return String.fromCharCode(64 + tile);
   };
 
@@ -159,7 +158,7 @@ const LetterQuestGame: React.FC = () => {
     );
   };
 
-  console.log(players, DiceIcon);
+  console.log(players, playerTiles);
 
   return (
     <div className="min-h-screen bg-green-700 text-white">
@@ -289,14 +288,14 @@ const LetterQuestGame: React.FC = () => {
                         Roll Dice
                       </button>
                       
-                      <button
+                      {players[3] !== 0 && <button
                         onClick={mintTile}
                         disabled={playerTiles.length >= 10}
                         className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition-colors"
                       >
                         <Plus className="w-4 h-4" />
                         Mint Tile
-                      </button>
+                      </button>}
                       
                       <button
                         onClick={discardTiles}
