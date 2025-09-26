@@ -43,33 +43,33 @@ const StackTilesGame: React.FC = () => {
   }, [blockNumber])
 
   const { data: playerTiles = [], refetch: playerTilesRefetch } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_STACKTITLES_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'getPlayerTiles',
     args: [address]
   }) as { data: any, refetch: () => void  };
 
   const { data: players = [], refetch: playerRefetch } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_STACKTITLES_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'players',
     args: [address]
   }) as { data: any, refetch: () => void  };
 
   const { data: targetLetter1, refetch: targetLetterRefetch1 } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_STACKTITLES_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'targetLetter1',
   }) as { data: BigInt, refetch: () => void  };
 
   const { data: targetLetter2, refetch: targetLetterRefetch2 } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_STACKTITLES_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'targetLetter2',
   }) as { data: BigInt, refetch: () => void  };
 
   const { data: targetLetter3, refetch: targetLetterRefetch3 } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_STACKTITLES_CONTRACT,
     abi: StackTiles.abi,
     functionName: 'targetLetter3',
   }) as { data: BigInt, refetch: () => void  };
@@ -80,7 +80,7 @@ const StackTilesGame: React.FC = () => {
     setIsLoading(true);
     try {
       writeContract({
-        address: import.meta.env.VITE_GAME_CONTRACT,
+        address: import.meta.env.VITE_STACKTITLES_CONTRACT,
         abi: StackTiles.abi,
         functionName: "joinGame",
       })
@@ -96,7 +96,7 @@ const StackTilesGame: React.FC = () => {
     setIsLoading(true);
     try {
       writeContract({
-        address: import.meta.env.VITE_GAME_CONTRACT,
+        address: import.meta.env.VITE_STACKTITLES_CONTRACT,
         abi: StackTiles.abi,
         functionName: "buyTile",
         value: parseEther("0.001")
@@ -113,7 +113,7 @@ const StackTilesGame: React.FC = () => {
     setIsLoading(true);
     try {
       writeContract({
-        address: import.meta.env.VITE_GAME_CONTRACT,
+        address: import.meta.env.VITE_STACKTITLES_CONTRACT,
         abi: StackTiles.abi,
         functionName: "discardTile",
          args: [selectedTile]
@@ -130,7 +130,7 @@ const StackTilesGame: React.FC = () => {
     setIsLoading(true);
     try {
       writeContract({
-        address: import.meta.env.VITE_GAME_CONTRACT,
+        address: import.meta.env.VITE_STACKTITLES_CONTRACT,
         abi: StackTiles.abi,
         functionName: "submitTile",
         args: [selectedTile]
