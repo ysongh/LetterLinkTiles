@@ -28,33 +28,33 @@ const LetterQuestGame: React.FC = () => {
   }, [blockNumber])
 
   const { data: playerTiles = [], refetch: playerTilesRefetch } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'getPlayerTiles',
     args: [address]
   }) as { data: any, refetch: () => void  };
 
   const { data: players = [], refetch: playerRefetch } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'players',
     args: [address]
   }) as { data: any, refetch: () => void  };
 
   const { data: targetWord1, refetch: targetWordRefetch1 } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'targetWord1',
   }) as { data: any, refetch: () => void  };
 
   const { data: targetWord2, refetch: targetWordRefetch2 } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'targetWord2',
   }) as { data: any, refetch: () => void };
 
   const { data: targetWord3, refetch: targetWordRefetch3 } = useReadContract({
-    address: import.meta.env.VITE_GAME_CONTRACT,
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'targetWord3',
   }) as { data: any,refetch: () => void  };
@@ -88,7 +88,7 @@ const LetterQuestGame: React.FC = () => {
   const joinGame = async () => {
     addGameEvent('join', 'You joined the game!');
     writeContract({
-      address: import.meta.env.VITE_GAME_CONTRACT,
+      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
       abi: LetterQuest.abi,
       functionName: "joinGame",
     })
@@ -96,7 +96,7 @@ const LetterQuestGame: React.FC = () => {
 
   const rollDice = async () => {
     writeContract({
-      address: import.meta.env.VITE_GAME_CONTRACT,
+      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
       abi: LetterQuest.abi,
       functionName: "rollDice",
     });
@@ -104,7 +104,7 @@ const LetterQuestGame: React.FC = () => {
 
   const mintTile = async () => {
     writeContract({
-      address: import.meta.env.VITE_GAME_CONTRACT,
+      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
       abi: LetterQuest.abi,
       functionName: "mintTile",
     });
@@ -116,7 +116,7 @@ const LetterQuestGame: React.FC = () => {
     if (selectedTiles.length === 0) return;
     
     writeContract({
-      address: import.meta.env.VITE_GAME_CONTRACT,
+      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
       abi: LetterQuest.abi,
       functionName: "discardTile",
       args: [selectedTiles]
@@ -132,7 +132,7 @@ const LetterQuestGame: React.FC = () => {
     const selectedTileValues = selectedTiles.map(index => playerTiles[index]);
 
     writeContract({
-      address: import.meta.env.VITE_GAME_CONTRACT,
+      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
       abi: LetterQuest.abi,
       functionName: "submitWord",
       args: [selectedTileValues]
