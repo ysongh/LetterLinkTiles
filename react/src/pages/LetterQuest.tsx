@@ -69,12 +69,12 @@ const LetterQuestGame: React.FC = () => {
 
   // Convert tile number to letter for display
   const tileToLetter = (tile: number): string => {
-    return String.fromCharCode(64 + tile);
+    return String.fromCharCode(64 + tile + 1);
   };
 
   // Get tile score based on Scrabble-like scoring
   const getTileScore = (tile: number): number => {
-    const scores = [0, 1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10];
+    const scores = [1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10];
     return scores[tile] || 0;
   };
 
