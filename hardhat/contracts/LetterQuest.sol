@@ -143,7 +143,7 @@ contract LetterQuest {
     
     // Compare each tile (assuming tiles are ASCII character codes)
     for (uint i = 0; i < tilesUsed.length; i++) {
-      if (tilesUsed[i] != uint8(wordBytes[i])) {
+      if (tilesUsed[i] + 65 != uint8(wordBytes[i])) {
         return false;
       }
     }
