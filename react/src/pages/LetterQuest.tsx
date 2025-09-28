@@ -18,6 +18,7 @@ const LetterQuestGame: React.FC = () => {
   
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
   const [gameEvents, setGameEvents] = useState<GameEvent[]>([]);
+  const [wordInput, setWordInput] = useState<string>("");
 
   useEffect(() => {
     playerTilesRefetch();
@@ -135,7 +136,7 @@ const LetterQuestGame: React.FC = () => {
       address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
       abi: LetterQuest.abi,
       functionName: "submitWord",
-      args: [selectedTileValues]
+      args: [selectedTileValues, wordInput]
     });
 
     setSelectedTiles([]);
@@ -305,15 +306,24 @@ const LetterQuestGame: React.FC = () => {
                         <Trash2 className="w-4 h-4" />
                         Discard Selected
                       </button>
-                      
-                      <button
-                        onClick={submitWord}
-                        disabled={selectedTiles.length === 0}
-                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition-colors"
-                      >
-                        <Send className="w-4 h-4" />
-                        Submit Word
-                      </button>
+
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={wordInput}
+                          onChange={(e) => setWordInput(e.target.value.toUpperCase())}
+                          placeholder="Enter your word..."
+                          className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          onClick={submitWord}
+                          disabled={selectedTiles.length === 0}
+                          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition-colors"
+                        >
+                          <Send className="w-4 h-4" />
+                          Submit Word
+                        </button>
+                      </div>
                     </>
                   )}
                 </div>

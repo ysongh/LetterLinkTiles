@@ -59,21 +59,26 @@ contract LetterQuest {
     emit RollResult(msg.sender, randomNumber);
   }
 
-  function submitWord(uint8[] calldata tilesUsed) external {
+  function submitWord(uint8[] calldata tilesUsed, string memory newTargetWord) external {
+    require(bytes(newTargetWord).length == 5, "Target word must be exactly 5 letters");
+    
     if (_compareTilesToWord(tilesUsed, targetWord1)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
+      targetWord1 = newTargetWord;
       emit WordSubmitted(msg.sender, targetWord1);
     } else if (_compareTilesToWord(tilesUsed, targetWord2)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
+      targetWord2 = newTargetWord;
       emit WordSubmitted(msg.sender, targetWord2);
     } else if (_compareTilesToWord(tilesUsed, targetWord3)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
+      targetWord3 = newTargetWord;
       emit WordSubmitted(msg.sender, targetWord3);
     }
   }
