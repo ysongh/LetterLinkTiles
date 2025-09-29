@@ -25,6 +25,9 @@ contract LetterQuest {
   string public targetWord1;
   string public targetWord2;
   string public targetWord3;
+  address public winner1;
+  address public winner2;
+  address public winner3;
   uint256 public tileCost = 0.001 ether;
 
   modifier onlyOwner() {
@@ -66,19 +69,28 @@ contract LetterQuest {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
+
       targetWord1 = newTargetWord;
+      winner1 = msg.sender;
+
       emit WordSubmitted(msg.sender, targetWord1);
     } else if (_compareTilesToWord(tilesUsed, targetWord2)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
+
       targetWord2 = newTargetWord;
+      winner2 = msg.sender;
+
       emit WordSubmitted(msg.sender, targetWord2);
     } else if (_compareTilesToWord(tilesUsed, targetWord3)) {
       uint256 wordScore = calculateWordScore(tilesUsed);
       players[msg.sender].score += wordScore;
       removeTilesFromPlayer(msg.sender, tilesUsed);
+
       targetWord3 = newTargetWord;
+      winner3 = msg.sender;
+
       emit WordSubmitted(msg.sender, targetWord3);
     }
   }
