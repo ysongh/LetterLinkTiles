@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Target, Trash2, Plus, Send, Gift } from 'lucide-react';
-import { useAccount, useBlockNumber, useConnect, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useBlockNumber, useConnect, useReadContract, useWatchContractEvent, useWriteContract } from "wagmi";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
 
@@ -19,6 +19,7 @@ const LetterQuestGame: React.FC = () => {
   const [selectedTiles, setSelectedTiles] = useState<number[]>([]);
   const [gameEvents, setGameEvents] = useState<GameEvent[]>([]);
   const [wordInput, setWordInput] = useState<string>("");
+  const [lastRoll, setLastRoll] = useState<number | null>(null);
 
   useEffect(() => {
     playerTilesRefetch();
@@ -79,6 +80,18 @@ const LetterQuestGame: React.FC = () => {
   }) as { data: string };
 
   const { writeContract } = useWriteContract();
+
+  useWatchContractEvent({
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+    abi: LetterQuest.abi,
+    eventName: 'RollResult',
+    onLogs(logs) {
+      logs.forEach((log) => {
+        console.log('Roll result:', log.args.num) // Assuming the event args structure
+        setLastRoll(log?.args?.num + 1);
+      })
+    },
+  })
 
   // Convert position number to letter (A=1, B=2, etc.)
   const positionToLetter = (pos: number): string => {
@@ -177,8 +190,6 @@ const LetterQuestGame: React.FC = () => {
     );
   };
 
-  console.log(players, playerTiles);
-
   return (
     <div className="min-h-screen bg-green-700 text-white">
       <div className="container mx-auto px-4 py-8">
@@ -263,6 +274,13 @@ const LetterQuestGame: React.FC = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Last roll indicator */}
+                  {lastRoll && (
+                    <div className="absolute top-4 right-4 bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold border-2 border-blue-300 animate-bounce">
+                      {lastRoll}
+                    </div>
+                  )}
                 </div>
 
                 {/* Player Stats Row */}
@@ -302,8 +320,7 @@ const LetterQuestGame: React.FC = () => {
                         onClick={rollDice}
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
                       >
-                        {/* {lastRoll ? <DiceIcon number={lastRoll} /> : <Dice1 className="w-4 h-4" />} */}
-                        <Dice1 className="w-4 h-4" />
+                        {lastRoll ? <DiceIcon number={lastRoll} /> : <Dice1 className="w-4 h-4" />}
                         Roll Dice
                       </button>
                       
