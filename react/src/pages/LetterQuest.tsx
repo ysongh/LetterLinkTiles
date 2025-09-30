@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Target, Trash2, Plus, Send, Gift } from 'lucide-react';
+import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Target, Trash2, Plus, Send, Gift, Home } from 'lucide-react';
 import { useAccount, useBlockNumber, useConnect, useReadContract, useWatchContractEvent, useWriteContract } from "wagmi";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
@@ -256,7 +256,7 @@ const LetterQuestGame: React.FC = () => {
                           top: `${y}px`,
                         }}
                       >
-                        {i === 25 ? 'S' : String.fromCharCode(65 + i)}
+                        {i === 25 ? <Home /> : String.fromCharCode(65 + i)}
                       </div>
                     );
                   })}
