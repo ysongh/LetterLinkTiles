@@ -3,6 +3,7 @@ import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Target, Trash2
 import { useAccount, useBlockNumber, useConnect, useReadContract, useWatchContractEvent, useWriteContract } from "wagmi";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
+import { formatAddress } from '../utils/format';
 
 interface GameEvent {
   type: 'join' | 'roll' | 'word' | 'mint' | 'discard';
@@ -202,22 +203,18 @@ const LetterQuestGame: React.FC = () => {
         </div>
 
         {/* Connection Status */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
-              <span>{isConnected ? `Connected: ${address}` : 'Not Connected'}</span>
-            </div>
-            {!isConnected && (
-              <button
-                onClick={() => connect({ connector: connectors[0] })}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
-              >
-                Connect Wallet
-              </button>
-            )}
+        {!isConnected && (<div className="w-[500px] mx-auto bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-8">
+          <div className="flex flex-col items-center">
+            <h2 className="text-xl mb-2">Connect Wallet to Play</h2>
+            <button
+              onClick={() => connect({ connector: connectors[0] })}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+            >
+              Connect Wallet
+            </button>
           </div>
         </div>
+        )}
 
         {isConnected && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -426,13 +423,13 @@ const LetterQuestGame: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
-                    {winner1}
+                    {formatAddress(winner1)}
                   </div>
                   <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
-                    {winner2}
+                    {formatAddress(winner2)}
                   </div>
                   <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
-                    {winner3}
+                    {formatAddress(winner3)}
                   </div>
                 </div>
               </div>
