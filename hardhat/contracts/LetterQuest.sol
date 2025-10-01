@@ -100,12 +100,17 @@ contract LetterQuest {
     targetWord3 = _targetWord3;
   }
 
-  function mintTile() external {
+  function mintTile() external payable {
     require(players[msg.sender].tiles.length < 10, "Cannot have more than 10 tiles");
     require(players[msg.sender].posititon > 0, "Cannot mint this tile");
+    require(msg.value >= tileCost, "Insufficient payment for tile");
 
     uint8 newTile = players[msg.sender].posititon - 1;
     players[msg.sender].tiles.push(newTile);
+
+    if (msg.value > tileCost) {
+      payable(msg.sender).transfer(msg.value - tileCost);
+    }
     
     emit TileMinted(msg.sender, newTile);
   }

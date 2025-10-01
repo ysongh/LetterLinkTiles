@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Target, Trash2, Plus, Send, Gift, Home } from 'lucide-react';
 import { useAccount, useBlockNumber, useConnect, useReadContract, useWatchContractEvent, useWriteContract } from "wagmi";
+import { parseEther } from "viem";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
 import { formatAddress } from '../utils/format';
@@ -140,6 +141,7 @@ const LetterQuestGame: React.FC = () => {
       address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
       abi: LetterQuest.abi,
       functionName: "mintTile",
+      value: parseEther("0.001")
     });
     
     addGameEvent('mint', `Minted tile`);
@@ -327,7 +329,7 @@ const LetterQuestGame: React.FC = () => {
                         className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition-colors"
                       >
                         <Plus className="w-4 h-4" />
-                        Mint Tile
+                        Mint Tile (0.001 FLOW)
                       </button>}
                       
                       <button
