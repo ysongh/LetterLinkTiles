@@ -141,11 +141,11 @@ contract LetterQuest {
   }
 
   function getRandomNumber() internal view returns (uint256) {
-    uint64 newRandom = revertibleRandom();
+    // uint64 newRandom = revertibleRandom();
     uint256 randomIndex = uint256(keccak256(abi.encodePacked(
       block.timestamp,
       msg.sender,
-      newRandom,
+      // newRandom,
       players[msg.sender].tiles.length
     ))) % 6;
     
