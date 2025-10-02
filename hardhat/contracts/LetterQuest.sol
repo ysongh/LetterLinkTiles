@@ -18,6 +18,7 @@ contract LetterQuest {
     uint8 posititon;
   }
 
+  address constant public cadenceArch = 0x0000000000000000000000010000000000000001;
   mapping(address => Player) public players;
   address[] public activePlayers;
   address public owner;
@@ -140,9 +141,11 @@ contract LetterQuest {
   }
 
   function getRandomNumber() internal view returns (uint256) {
+    uint64 newRandom = revertibleRandom();
     uint256 randomIndex = uint256(keccak256(abi.encodePacked(
       block.timestamp,
       msg.sender,
+      newRandom,
       players[msg.sender].tiles.length
     ))) % 6;
     
@@ -174,5 +177,15 @@ contract LetterQuest {
       score += tileScores[tilesUsed[i]];
     }
     return score;
+  }
+
+  // Function to fetch a pseudo-random value
+  function revertibleRandom() internal view returns (uint64) {
+    // Static call to the Cadence Arch contract's revertibleRandom function
+    (bool ok, bytes memory data) = cadenceArch.staticcall(abi.encodeWithSignature("revertibleRandom()"));
+    require(ok, "Failed to fetch a random number through Cadence Arch");
+    uint64 output = abi.decode(data, (uint64));
+    // Return the random value
+    return output;
   }
 }
