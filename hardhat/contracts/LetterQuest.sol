@@ -29,6 +29,9 @@ contract LetterQuest {
   address public winner2;
   address public winner3;
   uint256 public tileCost = 0.001 ether;
+  uint256 public prize1;
+  uint256 public prize2;
+  uint256 public prize3;
 
   modifier onlyOwner() {
     require(msg.sender == owner, "Only owner can call this function");
@@ -111,6 +114,14 @@ contract LetterQuest {
 
     if (msg.value > tileCost) {
       payable(msg.sender).transfer(msg.value - tileCost);
+    }
+
+    if (newTile % 3 == 0) {
+      prize1 += tileCost;
+    } else if (newTile % 3 == 1) {
+      prize2 += tileCost;
+    } else {
+      prize3 += tileCost;
     }
     
     emit TileMinted(msg.sender, newTile);
