@@ -70,17 +70,35 @@ const LetterQuestGame: React.FC = () => {
     functionName: 'winner1',
   }) as { data: string };
 
-    const { data: winner2 } = useReadContract({
+  const { data: winner2 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'winner2',
   }) as { data: string };
 
-    const { data: winner3 } = useReadContract({
+  const { data: winner3 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'winner3',
   }) as { data: string };
+
+  const { data: prize1 } = useReadContract({
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'prize1',
+  }) as { data: BigInt };
+
+  const { data: prize2 } = useReadContract({
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'prize2',
+  }) as { data: BigInt };
+
+  const { data: prize3 } = useReadContract({
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'prize3',
+  }) as { data: BigInt };
 
   const { writeContract } = useWriteContract();
 
@@ -409,6 +427,9 @@ const LetterQuestGame: React.FC = () => {
                 targetWord1={targetWord1}
                 targetWord2={targetWord2}
                 targetWord3={targetWord3}
+                prize1={prize1}
+                prize2={prize2}
+                prize3={prize3}
               />
 
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
