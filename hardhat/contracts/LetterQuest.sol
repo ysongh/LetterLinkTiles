@@ -138,17 +138,25 @@ contract LetterQuest {
     if (id == 1 && msg.sender == winner1) {
       amountEarned = prize1;
       prize1 = 0;
+      withdraw(amountEarned);
       emit PrizeClaimed(msg.sender, id, amountEarned);
     } else if (id == 2 && msg.sender == winner2) {
       amountEarned = prize2;
       prize2 = 0;
+      withdraw(amountEarned);
       emit PrizeClaimed(msg.sender, id, amountEarned);
     } else if (id == 3 && msg.sender == winner3) {
       amountEarned = prize3;
       prize3 = 0;
+      withdraw(amountEarned);
       emit PrizeClaimed(msg.sender, id, amountEarned);
     }
   }
+
+  function withdraw(uint256 amount) internal {
+		(bool success, ) = owner.call{ value: amount }("");
+		require(success, "Failed to send Ether");
+	}
 
   // Remove tiles from player's inventory
   function removeTilesFromPlayer(address player, uint8[] memory tilesUsed) internal {
