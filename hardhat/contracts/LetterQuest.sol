@@ -7,6 +7,7 @@ contract LetterQuest {
   event TileDiscard(address indexed player, uint8[] tile);
   event RollResult(address player, uint8 num);
   event WordSubmitted(address indexed player, string word);
+  event PrizeClaimed(address indexed player, uint8 rewardId, uint256 amount);
 
   uint8[27] public tileScores = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
@@ -130,6 +131,23 @@ contract LetterQuest {
   function discardTile(uint8[] memory tileIDs) external {
     removeTilesFromPlayer(msg.sender, tileIDs);
     emit TileDiscard(msg.sender, tileIDs);
+  }
+
+  function claimPrize(uint8 id) external {
+    uint256 amountEarned;
+    if (id == 1 && msg.sender == winner1) {
+      amountEarned = prize1;
+      prize1 = 0;
+      emit PrizeClaimed(msg.sender, id, amountEarned);
+    } else if (id == 2 && msg.sender == winner2) {
+      amountEarned = prize2;
+      prize2 = 0;
+      emit PrizeClaimed(msg.sender, id, amountEarned);
+    } else if (id == 3 && msg.sender == winner3) {
+      amountEarned = prize3;
+      prize3 = 0;
+      emit PrizeClaimed(msg.sender, id, amountEarned);
+    }
   }
 
   // Remove tiles from player's inventory
