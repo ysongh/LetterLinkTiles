@@ -46,19 +46,19 @@ const LetterQuestGame: React.FC = () => {
     args: [address]
   }) as { data: any, refetch: () => void  };
 
-  const { data: targetWord1, refetch: targetWordRefetch1 } = useReadContract({
+  const { data: targetWord1 = "", refetch: targetWordRefetch1 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'targetWord1',
   }) as { data: any, refetch: () => void  };
 
-  const { data: targetWord2, refetch: targetWordRefetch2 } = useReadContract({
+  const { data: targetWord2 = "", refetch: targetWordRefetch2 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'targetWord2',
   }) as { data: any, refetch: () => void };
 
-  const { data: targetWord3, refetch: targetWordRefetch3 } = useReadContract({
+  const { data: targetWord3 = "", refetch: targetWordRefetch3 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'targetWord3',
@@ -82,25 +82,27 @@ const LetterQuestGame: React.FC = () => {
     functionName: 'winner3',
   }) as { data: string };
 
-  const { data: prize1 } = useReadContract({
+  const { data: prize1 = 0 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'prize1',
   }) as { data: BigInt };
 
-  const { data: prize2 } = useReadContract({
+  const { data: prize2 = 0 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'prize2',
   }) as { data: BigInt };
 
-  const { data: prize3 } = useReadContract({
+  const { data: prize3 = 0 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
     functionName: 'prize3',
   }) as { data: BigInt };
 
   const { writeContract } = useWriteContract();
+
+  console.log(targetWord1)
 
   useWatchContractEvent({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
