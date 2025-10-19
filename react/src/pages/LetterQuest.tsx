@@ -100,7 +100,7 @@ const LetterQuestGame: React.FC = () => {
     functionName: 'prize3',
   }) as { data: BigInt };
 
-  const { writeContract } = useWriteContract();
+  const { writeContract, isPending } = useWriteContract();
 
   console.log(targetWord1)
 
@@ -141,45 +141,61 @@ const LetterQuestGame: React.FC = () => {
   };
 
   const joinGame = async () => {
-    addGameEvent('join', 'You joined the game!');
-    writeContract({
-      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
-      abi: LetterQuest.abi,
-      functionName: "joinGame",
-    })
+    try {
+      addGameEvent('join', 'You joined the game!');
+      writeContract({
+        address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+        abi: LetterQuest.abi,
+        functionName: "joinGame",
+      })
+    } catch(err) {
+      console.error(err);
+    }
   };
 
   const rollDice = async () => {
-    writeContract({
-      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
-      abi: LetterQuest.abi,
-      functionName: "rollDice",
-    });
+    try {
+      writeContract({
+        address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+        abi: LetterQuest.abi,
+        functionName: "rollDice",
+      });
+    } catch(err) {
+      console.error(err);
+    }
   };
 
   const mintTile = async () => {
-    writeContract({
-      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
-      abi: LetterQuest.abi,
-      functionName: "mintTile",
-      value: parseEther("0.001")
-    });
-    
-    addGameEvent('mint', `Minted tile`);
+    try {
+      writeContract({
+        address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+        abi: LetterQuest.abi,
+        functionName: "mintTile",
+        value: parseEther("0.001")
+      });
+      
+      addGameEvent('mint', `Minted tile`);
+    } catch(err) {
+      console.error(err);
+    }
   };
 
   const discardTiles = async () => {
     if (selectedTiles.length === 0) return;
-    
-    writeContract({
-      address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
-      abi: LetterQuest.abi,
-      functionName: "discardTile",
-      args: [selectedTiles]
-    })
-    
-    addGameEvent('discard', `Discarded tiles`);
-    setSelectedTiles([]);
+
+    try {
+      writeContract({
+        address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+        abi: LetterQuest.abi,
+        functionName: "discardTile",
+        args: [selectedTiles]
+      })
+      
+      addGameEvent('discard', `Discarded tiles`);
+      setSelectedTiles([]);
+    } catch(err) {
+      console.error(err);
+    }
   };
 
   const submitWord = async () => {
@@ -323,7 +339,7 @@ const LetterQuestGame: React.FC = () => {
               {/* Game Actions */}
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
                 <h3 className="text-xl font-bold mb-4">Game Actions</h3>
-                <div className="flex flex-wrap gap-4">
+                {isPending ? <p>Loading...</p> : <div className="flex flex-wrap gap-4">
                   {!players[0] && (
                     <button
                       onClick={joinGame}
@@ -364,6 +380,7 @@ const LetterQuestGame: React.FC = () => {
                     </>
                   )}
                 </div>
+                }
               </div>
 
               {/* Player Tiles */}
