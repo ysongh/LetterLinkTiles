@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Trash2, Plus, Send, Gift, Home } from 'lucide-react';
+import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Trash2, Plus, Send, Home } from 'lucide-react';
 import { useAccount, useBlockNumber, useConnect, useReadContract, useWatchContractEvent, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
-import { formatAddress } from '../utils/format';
 import TargetWords from '../components/letterQuest/TargetWords';
+import Winners from '../components/letterQuest/Winners';
 
 interface GameEvent {
   type: 'join' | 'roll' | 'word' | 'mint' | 'discard';
@@ -451,23 +451,11 @@ const LetterQuestGame: React.FC = () => {
                 prize3={prize3}
               />
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Gift className="w-5 h-5 text-green-400" />
-                  <h3 className="text-lg font-bold">Winners</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
-                    {formatAddress(winner1)}
-                  </div>
-                  <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
-                    {formatAddress(winner2)}
-                  </div>
-                  <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
-                    {formatAddress(winner3)}
-                  </div>
-                </div>
-              </div>
+              <Winners
+                winner1={winner1}
+                winner2={winner2}
+                winner3={winner3}
+              />
 
               {/* Game Events */}
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
