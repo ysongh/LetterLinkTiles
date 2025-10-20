@@ -180,6 +180,19 @@ const LetterQuestGame: React.FC = () => {
     }
   };
 
+  const claimPrize = async (id: number) => {
+    try {
+      writeContract({
+        address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+        abi: LetterQuest.abi,
+        functionName: "claimPrize",
+        args: [id]
+      });
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
   const discardTiles = async () => {
     if (selectedTiles.length === 0) return;
 
@@ -455,6 +468,7 @@ const LetterQuestGame: React.FC = () => {
                 winner1={winner1}
                 winner2={winner2}
                 winner3={winner3}
+                claimPrize={claimPrize}
               />
 
               {/* Game Events */}

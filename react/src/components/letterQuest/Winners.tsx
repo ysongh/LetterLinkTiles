@@ -5,13 +5,15 @@ import { formatAddress } from "../../utils/format";
 interface Winners {
   winner1: string,
   winner2: string,
-  winner3: string
+  winner3: string,
+  claimPrize: Function
 }
 
 function Winners({
   winner1,
   winner2,
-  winner3
+  winner3,
+  claimPrize
 }: Winners) {
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
@@ -20,13 +22,13 @@ function Winners({
         <h3 className="text-lg font-bold">Winners</h3>
       </div>
       <div className="space-y-2">
-        <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
+        <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg" onClick={() => claimPrize(1)}>
           {formatAddress(winner1)}
         </div>
-        <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
+        <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg" onClick={() => claimPrize(2)}>
           {formatAddress(winner2)}
         </div>
-        <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg">
+        <div className="bg-green-400/20 rounded-lg p-3 text-center font-mono text-lg" onClick={() => claimPrize(3)}>
           {formatAddress(winner3)}
         </div>
       </div>
