@@ -468,6 +468,7 @@ const LetterQuestGame: React.FC = () => {
                 winner1={winner1}
                 winner2={winner2}
                 winner3={winner3}
+                address={address}
                 claimPrize={claimPrize}
               />
 
