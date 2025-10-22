@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./TileTokenERC20.sol";
+
 contract LetterQuest {
+  TileTokenERC20 public immutable rewardToken;
+
   event PlayerJoined(address indexed player);
   event TileMinted(address indexed player, uint8 tile);
   event TileDiscard(address indexed player, uint8[] tile);
@@ -39,8 +43,9 @@ contract LetterQuest {
     _;
   }
 
-  constructor() {
+  constructor(address _rewardToken) {
     owner = msg.sender;
+    rewardToken = TileTokenERC20(_rewardToken);
   }
 
   function joinGame() external {

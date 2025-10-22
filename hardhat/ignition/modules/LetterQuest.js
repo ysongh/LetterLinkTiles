@@ -1,7 +1,8 @@
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 
 module.exports = buildModule("LetterQuestModule", (m) => {
-  const letterQuest = m.contract("LetterQuest", []);
+  const token20 = m.contract("TileTokenERC20", []);
+  const letterQuest = m.contract("LetterQuest", [token20]);
 
   const addTargetWordsCall = m.call(
     letterQuest,
@@ -10,6 +11,7 @@ module.exports = buildModule("LetterQuestModule", (m) => {
   );
 
   return {
+    token20,
     letterQuest,
     addTargetWordsCall
   };
