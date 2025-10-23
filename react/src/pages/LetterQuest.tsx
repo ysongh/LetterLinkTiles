@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Trash2, Plus, Send, Home } from 'lucide-react';
 import { useAccount, useBlockNumber, useConnect, useReadContract, useWatchContractEvent, useWriteContract } from "wagmi";
-import { parseEther } from "viem";
+import { formatEther, parseEther } from "viem";
 
 import LetterQuest from "../artifacts/contracts/LetterQuest.sol/LetterQuest.json";
 import TargetWords from '../components/letterQuest/TargetWords';
@@ -82,6 +82,13 @@ const LetterQuestGame: React.FC = () => {
     functionName: 'winner3',
   }) as { data: string };
 
+  const { data: tileToken = 0 } = useReadContract({
+    address: import.meta.env.VITE_TILETOKEN_CONTRACT,
+    abi: LetterQuest.abi,
+    functionName: 'balanceOf',
+    args: [address]
+  }) as { data: BigInt };
+
   const { data: prize1 = 0 } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
     abi: LetterQuest.abi,
@@ -102,7 +109,7 @@ const LetterQuestGame: React.FC = () => {
 
   const { writeContract, isPending } = useWriteContract();
 
-  console.log(targetWord1)
+  console.log(tileToken);
 
   useWatchContractEvent({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
@@ -278,6 +285,10 @@ const LetterQuestGame: React.FC = () => {
                   <Trophy className="w-6 h-6 text-yellow-400" />
                   <h3 className="text-xl font-bold">Game Board</h3>
                 </div>
+
+                <p>
+                  {formatEther(tileToken as bigint)} TILE
+                </p>
                 
                 {/* Circular Board */}
                 <div className="relative w-80 h-80 mx-auto mb-6">
