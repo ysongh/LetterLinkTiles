@@ -24,6 +24,7 @@ contract LetterQuest {
   }
 
   address constant public cadenceArch = 0x0000000000000000000000010000000000000001;
+  uint256 public constant GO_AROUND_BASE_REWARD = 100 * 10**18;
   mapping(address => Player) public players;
   address[] public activePlayers;
   address public owner;
@@ -66,6 +67,7 @@ contract LetterQuest {
 
     if (players[msg.sender].posititon > 26) {
       players[msg.sender].posititon =  players[msg.sender].posititon - 27;
+      rewardToken.mintReward(msg.sender, GO_AROUND_BASE_REWARD);
     }
 
     emit RollResult(msg.sender, randomNumber);
