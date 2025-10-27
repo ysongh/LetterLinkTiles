@@ -13,7 +13,7 @@ contract LetterQuest {
   event WordSubmitted(address indexed player, string word);
   event PrizeClaimed(address indexed player, uint8 rewardId, uint256 amount);
 
-  uint8[27] public tileScores = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+  uint8[27] public tileMinted = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   struct Player {
     bool isActive;
@@ -77,8 +77,7 @@ contract LetterQuest {
     require(bytes(newTargetWord).length == 5, "Target word must be exactly 5 letters");
     
     if (_compareTilesToWord(tilesUsed, targetWord1)) {
-      uint256 wordScore = calculateWordScore(tilesUsed);
-      players[msg.sender].score += wordScore;
+      players[msg.sender].score += 1;
       removeTilesFromPlayer(msg.sender, tilesUsed);
 
       targetWord1 = newTargetWord;
@@ -86,8 +85,7 @@ contract LetterQuest {
 
       emit WordSubmitted(msg.sender, targetWord1);
     } else if (_compareTilesToWord(tilesUsed, targetWord2)) {
-      uint256 wordScore = calculateWordScore(tilesUsed);
-      players[msg.sender].score += wordScore;
+      players[msg.sender].score += 1;
       removeTilesFromPlayer(msg.sender, tilesUsed);
 
       targetWord2 = newTargetWord;
@@ -95,8 +93,7 @@ contract LetterQuest {
 
       emit WordSubmitted(msg.sender, targetWord2);
     } else if (_compareTilesToWord(tilesUsed, targetWord3)) {
-      uint256 wordScore = calculateWordScore(tilesUsed);
-      players[msg.sender].score += wordScore;
+      players[msg.sender].score += 1;
       removeTilesFromPlayer(msg.sender, tilesUsed);
 
       targetWord3 = newTargetWord;
@@ -212,15 +209,6 @@ contract LetterQuest {
     }
     
     return true;
-  }
-
-  // Calculate word score based on tile values
-  function calculateWordScore(uint8[] memory tilesUsed) internal view returns (uint256) {
-    uint256 score = 0;
-    for (uint i = 0; i < tilesUsed.length; i++) {
-      score += tileScores[tilesUsed[i]];
-    }
-    return score;
   }
 
   // Function to fetch a pseudo-random value
