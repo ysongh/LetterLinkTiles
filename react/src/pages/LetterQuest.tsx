@@ -118,7 +118,7 @@ const LetterQuestGame: React.FC = () => {
     eventName: 'RollResult',
     onLogs(logs) {
       logs.forEach((log) => {
-        console.log('Roll result:', log.args.num) // Assuming the event args structure
+        console.log('Roll result:', log.args.num)
         setLastRoll(log?.args?.num + 1);
       })
     },
@@ -127,7 +127,7 @@ const LetterQuestGame: React.FC = () => {
   // Convert position number to letter (A=1, B=2, etc.)
   const positionToLetter = (pos: number): string => {
     if (pos === 0) return 'START';
-    return String.fromCharCode(64 + pos); // 65 is 'A'
+    return String.fromCharCode(64 + pos);
   };
 
   // Convert tile number to letter for display
@@ -240,7 +240,7 @@ const LetterQuestGame: React.FC = () => {
       player: 'You',
       data,
       timestamp: Date.now()
-    }].slice(-10)); // Keep last 10 events
+    }].slice(-10));
   };
 
   const toggleTileSelection = (index: number) => {
@@ -287,59 +287,123 @@ const LetterQuestGame: React.FC = () => {
                   <h3 className="text-xl font-bold">Game Board</h3>
                 </div>
 
-                <p>
+                <p className="mb-4">
                   {formatEther(tileToken as bigint)} TILE
                 </p>
                 
-                {/* Circular Board */}
-                <div className="relative w-80 h-80 mx-auto mb-6">
-                  <div className="absolute inset-0 rounded-full border-4 border-white/30 bg-gradient-to-br from-purple-800/50 to-blue-800/50"></div>
+                {/* Square Board */}
+                <div className="relative w-96 h-96 mx-auto mb-6 bg-gradient-to-br from-purple-800/50 to-blue-800/50 rounded-lg border-4 border-white/30">
                   
-                  {/* Board positions */}
-                  {Array.from({ length: 26 }, (_, i) => {
-                    const angle = (i * 360) / 26 - 90; // Start from top
-                    const radian = (angle * Math.PI) / 180;
-                    const radius = 140; // Distance from center
-                    const x = Math.cos(radian) * radius + 160; // Center offset
-                    const y = Math.sin(radian) * radius + 160; // Center offset
-                    const isPlayerPosition = players[3] === i + 1;
-                    const isStart = i === 25; // Position 0 maps to index 25
-                    
-                    return (
-                      <div
-                        key={i}
-                        className={`absolute w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${
-                          isStart
-                            ? 'bg-green-500 border-green-300 text-white shadow-lg'
-                            : isPlayerPosition
-                            ? 'bg-yellow-400 border-yellow-300 text-black shadow-lg animate-pulse scale-125'
-                            : 'bg-white/20 border-white/40 text-white hover:bg-white/30'
-                        }`}
-                        style={{
-                          left: `${x}px`,
-                          top: `${y}px`,
-                        }}
-                      >
-                        {i === 25 ? <Home /> : String.fromCharCode(65 + i)}
-                      </div>
-                    );
-                  })}
-                  
-                  {/* Center area with player info */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center bg-black/30 rounded-full p-6 border border-white/20">
-                      <div className="text-lg font-bold text-yellow-400">Score</div>
-                      <div className="text-2xl font-bold">{Number(players[1] || 0)}</div>
-                      <div className="text-xs text-gray-300 mt-1">
-                        {players[0] ? positionToLetter(players[3]) : 'Inactive'}
-                      </div>
-                    </div>
+                  {/* Top Row - START + A-F (positions 0-6) */}
+                  <div className="absolute top-0 left-0 right-0 flex justify-between p-2">
+                    {Array.from({ length: 7 }, (_, i) => {
+                      const position = i;
+                      const isPlayerPosition = players[3] === position;
+                      const isStart = position === 0;
+                      
+                      return (
+                        <div
+                          key={i}
+                          className={`w-12 h-12 flex items-center justify-center text-xs font-bold border-2 rounded-lg transition-all duration-300 ${
+                            isStart
+                              ? 'bg-green-500 border-green-300 text-white shadow-lg'
+                              : isPlayerPosition
+                              ? 'bg-yellow-400 border-yellow-300 text-black shadow-lg animate-pulse scale-110'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30'
+                          }`}
+                        >
+                          {position === 0 ? <Home className="w-5 h-5" /> : String.fromCharCode(64 + position)}
+                        </div>
+                      );
+                    })}
                   </div>
 
+                  {/* Right Column - G-M (positions 7-13) */}
+                  <div className="absolute top-14 right-0 bottom-14 flex flex-col justify-between p-2">
+                    {Array.from({ length: 7 }, (_, i) => {
+                      const position = i + 7;
+                      const isPlayerPosition = players[3] === position;
+                      
+                      return (
+                        <div
+                          key={i}
+                          className={`w-12 h-12 flex items-center justify-center text-xs font-bold border-2 rounded-lg transition-all duration-300 ${
+                            isPlayerPosition
+                              ? 'bg-yellow-400 border-yellow-300 text-black shadow-lg animate-pulse scale-110'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30'
+                          }`}
+                        >
+                          {String.fromCharCode(64 + position)}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Bottom Row - N-T (positions 14-20, reversed) */}
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-between p-2">
+                    {Array.from({ length: 7 }, (_, i) => {
+                      const position = 20 - i;
+                      const isPlayerPosition = players[3] === position;
+                      
+                      return (
+                        <div
+                          key={i}
+                          className={`w-12 h-12 flex items-center justify-center text-xs font-bold border-2 rounded-lg transition-all duration-300 ${
+                            isPlayerPosition
+                              ? 'bg-yellow-400 border-yellow-300 text-black shadow-lg animate-pulse scale-110'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30'
+                          }`}
+                        >
+                          {String.fromCharCode(64 + position)}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Left Column - U-Z (positions 21-26, reversed) */}
+                  <div className="absolute top-14 left-0 bottom-14 flex flex-col justify-between p-2">
+                    {Array.from({ length: 6 }, (_, i) => {
+                      const position = 26 - i;
+                      const isPlayerPosition = players[3] === position;
+                      
+                      return (
+                        <div
+                          key={i}
+                          className={`w-12 h-12 flex items-center justify-center text-xs font-bold border-2 rounded-lg transition-all duration-300 ${
+                            isPlayerPosition
+                              ? 'bg-yellow-400 border-yellow-300 text-black shadow-lg animate-pulse scale-110'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30'
+                          }`}
+                        >
+                          {String.fromCharCode(64 + position)}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Center area with player info */}
+                  <div className="absolute inset-16 flex items-center justify-center">
+                    <div className="text-center bg-black/40 rounded-lg p-6 border border-white/20 backdrop-blur-sm">
+                      <div className="text-lg font-bold text-yellow-400">Score</div>
+                      <div className="text-3xl font-bold">{Number(players[1] || 0)}</div>
+                      <div className="text-sm text-gray-300 mt-1">
+                        {players[0] ? positionToLetter(players[3]) : 'Join Game'}
+                      </div>
+                      {players[0] && (
+                        <div className="text-xs text-gray-400 mt-2">
+                          Position {players[3]}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
                   {/* Last roll indicator */}
                   {lastRoll && (
-                    <div className="absolute top-4 right-4 bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold border-2 border-blue-300 animate-bounce">
-                      {lastRoll}
+                    <div className="absolute -top-4 -right-4 bg-blue-500 text-white rounded-lg w-16 h-16 flex items-center justify-center font-bold border-2 border-blue-300 animate-bounce z-10">
+                      <div className="text-center">
+                        <div className="text-lg">{lastRoll}</div>
+                        <div className="text-xs">ROLL</div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -375,7 +439,7 @@ const LetterQuestGame: React.FC = () => {
                     </button>
                   )}
                   
-                  {players[0]&& (
+                  {players[0] && (
                     <>
                       <button
                         onClick={rollDice}
