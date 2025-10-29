@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Trophy, Users, Trash2, Plus, Send, Home } from 'lucide-react';
 import { useAccount, useBlockNumber, useConnect, useReadContract, useWatchContractEvent, useWriteContract } from "wagmi";
 import { formatEther, parseEther } from "viem";
@@ -9,13 +9,15 @@ import Winners from '../components/letterQuest/Winners';
 import Rules from '../components/letterQuest/Rules';
 
 interface GameEvent {
-  type: 'join' | 'roll' | 'word' | 'mint' | 'discard';
+  type: 'join' | 'roll' | 'word' | 'mint' | 'discard' | 'TileMinted';
   player: string;
   data?: any;
   timestamp: number;
 }
 
 const LetterQuestGame: React.FC = () => {
+  const processedEvents = useRef(new Set())
+
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { data: blockNumber } = useBlockNumber({ watch: true });
@@ -31,7 +33,7 @@ const LetterQuestGame: React.FC = () => {
     targetWordRefetch1();
     targetWordRefetch2();
     targetWordRefetch3();
-  }, [blockNumber])
+  }, [blockNumber]);
 
   const { data: playerTiles = [], refetch: playerTilesRefetch } = useReadContract({
     address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
@@ -118,8 +120,27 @@ const LetterQuestGame: React.FC = () => {
     eventName: 'RollResult',
     onLogs(logs) {
       logs.forEach((log) => {
-        console.log('Roll result:', log.args.num)
+        console.log('Roll result:', log.args.num);
         setLastRoll(log?.args?.num + 1);
+      })
+    },
+  })
+
+  useWatchContractEvent({
+    address: import.meta.env.VITE_LETTERQUEST_CONTRACT,
+    abi: LetterQuest.abi,
+    // No eventName specified = listen to ALL events
+    onLogs(logs) {
+      logs.forEach((log) => {
+        const eventId = `${log.transactionHash}-${log.logIndex}`
+
+        if (!processedEvents.current.has(eventId)) {
+          processedEvents.current.add(eventId);
+          console.log(log)
+          // Handle your event here
+          addGameEvent(log?.eventName, JSON.stringify(log?.args, null, 2));
+        }
+      
       })
     },
   })
