@@ -157,6 +157,16 @@ contract LetterQuest {
     }
   }
 
+  function fundPrize(uint8 id) external payable {
+    if (id == 1) {
+      prize1 += msg.value;
+    } else if (id == 2) {
+      prize2 += msg.value;
+    } else if (id == 3) {
+      prize3 += msg.value;
+    }
+  }
+
   function withdraw(uint256 amount) internal {
 		(bool success, ) = owner.call{ value: amount }("");
 		require(success, "Failed to send Ether");
